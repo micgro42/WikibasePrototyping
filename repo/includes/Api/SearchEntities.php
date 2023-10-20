@@ -7,6 +7,9 @@ namespace Wikibase\Repo\Api;
 use ApiBase;
 use ApiMain;
 use ApiResult;
+use EntitySchema\Domain\Model\EntitySchemaId;
+use InvalidArgumentException;
+use MediaWiki\Title\Title;
 use Wikibase\DataAccess\EntitySourceLookup;
 use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Term\Term;
@@ -144,6 +147,24 @@ class SearchEntities extends ApiBase {
 	 * @throws \ApiUsageException
 	 */
 	private function getSearchEntries( array $params ): array {
+		if ( $params['type'] === 'entityschema' ) {
+			try {
+				$id = new EntitySchemaId( $params['search'] );
+			} catch ( InvalidArgumentException $exception ) {
+				return [];
+			}
+			$title = Title::makeTitleSafe( NS_ENTITYSCHEMA_JSON, $id ); // TODO use TitleFactory
+			if ( $title->exists() ) {
+				return [ [
+					'id' => $id->getSerialization(),
+					'title' => $title->getPrefixedText(),
+					'pageid' => $title->getArticleID(),
+					'display' => [], // TODO use EntitySchemaConverter::getMonolingualNameBadgeData()?
+				] ];
+			}
+			return [];
+		}
+
 		try {
 			$searchResults = $this->entitySearchHelper->getRankedSearchResults(
 				$params['search'],
@@ -346,7 +367,7 @@ class SearchEntities extends ApiBase {
 				ParamValidator::PARAM_DEFAULT => false,
 			],
 			'type' => [
-				ParamValidator::PARAM_TYPE => $this->enabledEntityTypes,
+				ParamValidator::PARAM_TYPE => [ ...$this->enabledEntityTypes, 'entityschema' ],
 				ParamValidator::PARAM_DEFAULT => 'item',
 			],
 			'limit' => [
