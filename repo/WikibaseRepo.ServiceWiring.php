@@ -842,8 +842,13 @@ return [
 
 	'WikibaseRepo.EntityIdParser' => function ( MediaWikiServices $services ): EntityIdParser {
 		$settings = WikibaseRepo::getSettings( $services );
+		$entityIdBuilders = WikibaseRepo::getEntityTypeDefinitions( $services )->getEntityIdBuilders();
+		if ( defined( 'NS_ENTITYSCHEMA_JSON') ) { // TODO proper hook
+			$entityIdBuilders['/^E[1-9]\d{0,9}\z/'] = static fn ( string $serialization ) => new EntitySchemaId( $serialization );
+		}
+
 		$dispatchingEntityIdParser = new DispatchingEntityIdParser(
-			WikibaseRepo::getEntityTypeDefinitions( $services )->getEntityIdBuilders()
+			$entityIdBuilders
 		);
 
 		if ( $settings->getSetting( 'federatedPropertiesEnabled' ) ) {

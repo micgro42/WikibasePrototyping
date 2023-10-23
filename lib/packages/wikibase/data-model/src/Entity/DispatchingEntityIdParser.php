@@ -2,7 +2,6 @@
 
 namespace Wikibase\DataModel\Entity;
 
-use EntitySchema\Domain\Model\EntitySchemaId;
 use InvalidArgumentException;
 
 /**
@@ -42,9 +41,6 @@ class DispatchingEntityIdParser implements EntityIdParser {
 
 		if ( $this->idBuilders === [] ) {
 			throw new EntityIdParsingException( 'No id builders are configured' );
-		}
-		if ( $idSerialization && $idSerialization[0] === 'E' ) {
-			return new EntitySchemaId( $idSerialization );
 		}
 
 		foreach ( $this->idBuilders as $idPattern => $idBuilder ) {
