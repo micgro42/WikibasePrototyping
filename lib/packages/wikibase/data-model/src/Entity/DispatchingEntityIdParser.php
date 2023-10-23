@@ -43,7 +43,7 @@ class DispatchingEntityIdParser implements EntityIdParser {
 		if ( $this->idBuilders === [] ) {
 			throw new EntityIdParsingException( 'No id builders are configured' );
 		}
-		if ( $idSerialization[0] === 'E' ) {
+		if ( $idSerialization && $idSerialization[0] === 'E' ) {
 			return new EntitySchemaId( $idSerialization );
 		}
 
