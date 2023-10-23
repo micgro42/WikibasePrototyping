@@ -10,6 +10,7 @@ use DataValues\Serializers\DataValueSerializer;
 use DataValues\StringValue;
 use DataValues\TimeValue;
 use DataValues\UnknownValue;
+use EntitySchema\Domain\Model\EntitySchemaId;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use Psr\Log\LoggerInterface;
@@ -395,8 +396,13 @@ return [
 	},
 
 	'WikibaseClient.EntityIdParser' => function ( MediaWikiServices $services ): EntityIdParser {
+		$entityIdBuilders = WikibaseClient::getEntityTypeDefinitions($services)->getEntityIdBuilders();
+		if ( defined( 'NS_ENTITYSCHEMA_JSON') ) { // TODO proper hook
+			$entityIdBuilders['/^E[1-9]\d{0,9}\z/'] = static fn ( string $serialization ) => new EntitySchemaId( $serialization );
+		}
+
 		return new DispatchingEntityIdParser(
-			WikibaseClient::getEntityTypeDefinitions( $services )->getEntityIdBuilders()
+			$entityIdBuilders
 		);
 	},
 
