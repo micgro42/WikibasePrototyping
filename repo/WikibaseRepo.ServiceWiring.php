@@ -502,11 +502,6 @@ return [
 				// TODO this should perhaps be factored out into a class
 				if ( isset( $value['id'] ) ) {
 					try {
-						if ( $value['id'][0] === 'E' ) {
-							return new EntityIdValue(
-								new EntitySchemaId( $value['id'] ),
-							);
-						}
 						return new EntityIdValue( WikibaseRepo::getEntityIdParser( $services )->parse( $value['id'] ) );
 					} catch ( EntityIdParsingException $parsingException ) {
 						if ( is_string( $value['id'] ) ) {
