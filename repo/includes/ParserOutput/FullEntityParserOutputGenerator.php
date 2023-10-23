@@ -87,7 +87,7 @@ class FullEntityParserOutputGenerator implements EntityParserOutputGenerator {
 		$parserOutput = new ParserOutput();
 
 		$updaterCollection = new EntityParserOutputDataUpdaterCollection( $parserOutput, $this->dataUpdaters );
-//		$updaterCollection->updateParserOutput( $entity );
+		$updaterCollection->updateParserOutput( $entity );
 
 		$this->configBuilder->build( $entity, $parserOutput );
 

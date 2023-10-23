@@ -2,6 +2,7 @@
 
 namespace Wikibase\Repo\ParserOutput;
 
+use EntitySchema\Domain\Model\EntitySchemaId;
 use MediaWiki\Cache\LinkBatchFactory;
 use MediaWiki\Title\Title;
 use ParserOutput;
@@ -60,6 +61,10 @@ class ReferencedEntitiesDataUpdater implements EntityParserOutputUpdater {
 		$linkBatch->setCaller( __METHOD__ );
 
 		foreach ( $entityIds as $entityId ) {
+			if ( $entityId instanceof EntitySchemaId ) {
+				$linkBatch->add( NS_ENTITYSCHEMA_JSON, $entityId->getSerialization() ); // TODO hook
+				continue;
+			}
 			$linkBatch->addObj( $this->entityTitleLookup->getTitleForId( $entityId ) );
 		}
 
