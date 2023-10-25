@@ -2,6 +2,7 @@
 
 namespace Wikibase\Repo\Specials;
 
+use EntitySchema\Domain\Model\EntitySchemaId;
 use HttpError;
 use Wikibase\DataModel\Entity\EntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdParsingException;
@@ -70,6 +71,9 @@ class SpecialEntityPage extends SpecialWikibasePage {
 		try {
 			$entityId = $this->entityIdParser->parse( $id );
 		} catch ( EntityIdParsingException $ex ) {
+			throw new HttpError( 400, $this->msg( 'wikibase-entitypage-bad-id', $id ) );
+		}
+		if ( $entityId instanceof EntitySchemaId ) { // TODO some kind of hook?
 			throw new HttpError( 400, $this->msg( 'wikibase-entitypage-bad-id', $id ) );
 		}
 
