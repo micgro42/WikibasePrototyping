@@ -7,6 +7,7 @@ use ValueParsers\StringValueParser;
 use Wikibase\DataModel\Entity\EntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdParsingException;
 use Wikibase\DataModel\Entity\EntityIdValue;
+use Wikibase\Lib\HackPseudoEntityIdParser;
 
 /**
  * Parser that parses entity id strings into EntityIdValue objects.
@@ -20,11 +21,11 @@ class EntityIdValueParser extends StringValueParser {
 	private const FORMAT_NAME = 'entity-id-value';
 
 	/**
-	 * @var EntityIdParser
+	 * @var HackPseudoEntityIdParser
 	 */
 	private $parser;
 
-	public function __construct( EntityIdParser $parser ) {
+	public function __construct( HackPseudoEntityIdParser $parser ) {
 		parent::__construct();
 
 		$this->parser = $parser;

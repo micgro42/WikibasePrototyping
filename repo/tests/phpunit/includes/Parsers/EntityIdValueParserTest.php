@@ -3,6 +3,7 @@
 namespace Wikibase\Repo\Tests\Parsers;
 
 use DataValues\DataValue;
+use EntitySchema\Domain\Model\EntitySchemaId;
 use ValueParsers\ParseException;
 use ValueParsers\ParserOptions;
 use ValueParsers\ValueParser;
@@ -10,6 +11,7 @@ use Wikibase\DataModel\Entity\BasicEntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdValue;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\NumericPropertyId;
+use Wikibase\Lib\HackPseudoEntityIdParser;
 use Wikibase\Repo\Parsers\EntityIdValueParser;
 
 /**
@@ -29,7 +31,7 @@ class EntityIdValueParserTest extends \PHPUnit\Framework\TestCase {
 	 * @return EntityIdValueParser
 	 */
 	protected function getInstance() {
-		return new EntityIdValueParser( new BasicEntityIdParser() );
+		return new EntityIdValueParser( new HackPseudoEntityIdParser( new BasicEntityIdParser() ) );
 	}
 
 	/**
@@ -39,6 +41,7 @@ class EntityIdValueParserTest extends \PHPUnit\Framework\TestCase {
 		$valid = [
 			'q1' => new EntityIdValue( new ItemId( 'q1' ) ),
 			'p1' => new EntityIdValue( new NumericPropertyId( 'p1' ) ),
+			'E1' => new EntityIdValue( new EntitySchemaId( 'E1' ) ),
 		];
 
 		foreach ( $valid as $value => $expected ) {
