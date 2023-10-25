@@ -3,6 +3,7 @@
 namespace Wikibase\Client\Usage;
 
 use DataValues\UnboundedQuantityValue;
+use EntitySchema\Domain\Model\EntitySchemaId;
 use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\EntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdParsingException;
@@ -70,6 +71,11 @@ class UsageTrackingSnakFormatter implements SnakFormatter {
 			// WikibaseValueFormatterBuilders and what the individual formatters actually use.
 			if ( $value instanceof EntityIdValue ) {
 				$entityId = $value->getEntityId();
+				if ( $entityId instanceof EntitySchemaId ) {
+					// directly return entity ID serialization.
+					// do not pass addLabelUsage(). do not collect addTitleUsage().
+					return $entityId->getSerialization();
+				}
 				$this->addLabelUsage( $entityId );
 
 				// This title usage aspect must be kept in sync with what the formatters from
