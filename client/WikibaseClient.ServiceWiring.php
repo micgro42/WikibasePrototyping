@@ -10,7 +10,6 @@ use DataValues\Serializers\DataValueSerializer;
 use DataValues\StringValue;
 use DataValues\TimeValue;
 use DataValues\UnknownValue;
-use EntitySchema\Domain\Model\EntitySchemaId;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use Psr\Log\LoggerInterface;
@@ -95,6 +94,7 @@ use Wikibase\Lib\Formatters\OutputFormatValueFormatterFactory;
 use Wikibase\Lib\Formatters\Reference\WellKnownReferenceProperties;
 use Wikibase\Lib\Formatters\WikibaseSnakFormatterBuilders;
 use Wikibase\Lib\Formatters\WikibaseValueFormatterBuilders;
+use Wikibase\Lib\HackPseudoEntityIdParser;
 use Wikibase\Lib\LanguageFallbackChainFactory;
 use Wikibase\Lib\LanguageNameLookupFactory;
 use Wikibase\Lib\MediaWikiMessageInLanguageProvider;
@@ -272,7 +272,7 @@ return [
 			'time' => TimeValue::class,
 			'wikibase-entityid' => function ( $value ) use ( $services ) {
 				return isset( $value['id'] )
-					? new EntityIdValue( WikibaseClient::getEntityIdParser( $services )->parse( $value['id'] ) )
+					? new EntityIdValue( WikibaseClient::getHackPseudoEntityIdParser( $services )->parse( $value['id'] ) )
 					: EntityIdValue::newFromArray( $value );
 			},
 		] );
@@ -396,13 +396,8 @@ return [
 	},
 
 	'WikibaseClient.EntityIdParser' => function ( MediaWikiServices $services ): EntityIdParser {
-		$entityIdBuilders = WikibaseClient::getEntityTypeDefinitions($services)->getEntityIdBuilders();
-		if ( defined( 'NS_ENTITYSCHEMA_JSON') ) { // TODO proper hook
-			$entityIdBuilders['/^E[1-9]\d{0,9}\z/'] = static fn ( string $serialization ) => new EntitySchemaId( $serialization );
-		}
-
 		return new DispatchingEntityIdParser(
-			$entityIdBuilders
+			WikibaseClient::getEntityTypeDefinitions( $services )->getEntityIdBuilders()
 		);
 	},
 
@@ -504,6 +499,10 @@ return [
 			WikibaseClient::getTermLookup( $services ),
 			WikibaseClient::getTermBuffer( $services )
 		);
+	},
+
+	'WikibaseClient.HackPseudoEntityIdParser' => function ( MediaWikiServices $services ): HackPseudoEntityIdParser {
+		return new HackPseudoEntityIdParser( WikibaseClient::getEntityIdParser( $services ) );
 	},
 
 	'WikibaseClient.HookRunner' => function ( MediaWikiServices $services ): WikibaseClientHookRunner {

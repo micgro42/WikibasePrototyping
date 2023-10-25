@@ -15,7 +15,6 @@ use Deserializers\DispatchableDeserializer;
 use Deserializers\DispatchingDeserializer;
 use Diff\Comparer\ComparableComparer;
 use Diff\Differ\OrderedListDiffer;
-use EntitySchema\Domain\Model\EntitySchemaId;
 use MediaWiki\Logger\LoggerFactory;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\Site\MediaWikiPageNameNormalizer;
@@ -83,6 +82,7 @@ use Wikibase\Lib\Formatters\OutputFormatValueFormatterFactory;
 use Wikibase\Lib\Formatters\SnakFormatter;
 use Wikibase\Lib\Formatters\WikibaseSnakFormatterBuilders;
 use Wikibase\Lib\Formatters\WikibaseValueFormatterBuilders;
+use Wikibase\Lib\HackPseudoEntityIdParser;
 use Wikibase\Lib\LanguageFallbackChainFactory;
 use Wikibase\Lib\LanguageNameLookupFactory;
 use Wikibase\Lib\MediaWikiMessageInLanguageProvider;
@@ -502,7 +502,7 @@ return [
 				// TODO this should perhaps be factored out into a class
 				if ( isset( $value['id'] ) ) {
 					try {
-						return new EntityIdValue( WikibaseRepo::getEntityIdParser( $services )->parse( $value['id'] ) );
+						return new EntityIdValue( WikibaseRepo::getHackPseudoEntityIdParser( $services )->parse( $value['id'] ) );
 					} catch ( EntityIdParsingException $parsingException ) {
 						if ( is_string( $value['id'] ) ) {
 							$message = 'Can not parse id \'' . $value['id'] . '\' to build EntityIdValue with';
@@ -837,13 +837,8 @@ return [
 
 	'WikibaseRepo.EntityIdParser' => function ( MediaWikiServices $services ): EntityIdParser {
 		$settings = WikibaseRepo::getSettings( $services );
-		$entityIdBuilders = WikibaseRepo::getEntityTypeDefinitions( $services )->getEntityIdBuilders();
-		if ( defined( 'NS_ENTITYSCHEMA_JSON') ) { // TODO proper hook
-			$entityIdBuilders['/^E[1-9]\d{0,9}\z/'] = static fn ( string $serialization ) => new EntitySchemaId( $serialization );
-		}
-
 		$dispatchingEntityIdParser = new DispatchingEntityIdParser(
-			$entityIdBuilders
+			WikibaseRepo::getEntityTypeDefinitions( $services )->getEntityIdBuilders()
 		);
 
 		if ( $settings->getSetting( 'federatedPropertiesEnabled' ) ) {
@@ -1209,6 +1204,10 @@ return [
 		return array_map( function ( $context ): string {
 			return is_callable( $context ) ? $context() : $context;
 		}, $searchTypeContexts );
+	},
+
+	'WikibaseRepo.HackPseudoEntityIdParser' => function ( MediaWikiServices $services ): HackPseudoEntityIdParser {
+		return new HackPseudoEntityIdParser( WikibaseRepo::getEntityIdParser( $services ) );
 	},
 
 	'WikibaseRepo.IdGenerator' => function ( MediaWikiServices $services ): IdGenerator {

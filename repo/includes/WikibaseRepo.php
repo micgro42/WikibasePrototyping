@@ -46,6 +46,7 @@ use Wikibase\Lib\Formatters\OutputFormatSnakFormatterFactory;
 use Wikibase\Lib\Formatters\OutputFormatValueFormatterFactory;
 use Wikibase\Lib\Formatters\WikibaseSnakFormatterBuilders;
 use Wikibase\Lib\Formatters\WikibaseValueFormatterBuilders;
+use Wikibase\Lib\HackPseudoEntityIdParser;
 use Wikibase\Lib\LanguageFallbackChainFactory;
 use Wikibase\Lib\LanguageNameLookupFactory;
 use Wikibase\Lib\MessageInLanguageProvider;
@@ -1088,6 +1089,13 @@ class WikibaseRepo {
 	): ItemDisambiguationFactory {
 		return ( $services ?: MediaWikiServices::getInstance() )
 			->get( 'WikibaseRepo.ItemDisambiguationFactory' );
+	}
+
+	public static function getHackPseudoEntityIdParser(
+		ContainerInterface $services = null
+	): HackPseudoEntityIdParser {
+		return ( $services ?: MediaWikiServices::getInstance() )
+			->get( 'WikibaseRepo.HackPseudoEntityIdParser' );
 	}
 
 }
