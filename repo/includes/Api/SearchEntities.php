@@ -7,6 +7,7 @@ namespace Wikibase\Repo\Api;
 use ApiBase;
 use ApiMain;
 use ApiResult;
+use MediaWiki\MediaWikiServices;
 use Wikibase\DataAccess\EntitySourceLookup;
 use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Term\Term;
@@ -72,6 +73,8 @@ class SearchEntities extends ApiBase {
 	/** @var (string|null)[] */
 	private $searchProfiles;
 
+	private ?array $pseudoEntityTypeHandlers = null;
+
 	/**
 	 * @see ApiBase::__construct
 	 */
@@ -132,6 +135,19 @@ class SearchEntities extends ApiBase {
 		);
 	}
 
+	private function getPseudoEntityTypeHandlers(): array {
+		if ( $this->pseudoEntityTypeHandlers === null ) {
+			$this->pseudoEntityTypeHandlers = [];
+			$runner = MediaWikiServices::getInstance()->getHookContainer(); // TODO inject
+			$runner->run( // TODO maybe use a hook interface
+				'WikibasePseudoEntities_SearchEntities_Handlers',
+				[ &$this->pseudoEntityTypeHandlers ],
+				[ 'abortable' => false ]
+			);
+		}
+		return $this->pseudoEntityTypeHandlers;
+	}
+
 	/**
 	 * Populates the search result returning the number of requested matches plus one additional
 	 * item for being able to determine if there would be any more results.
@@ -144,6 +160,11 @@ class SearchEntities extends ApiBase {
 	 * @throws \ApiUsageException
 	 */
 	private function getSearchEntries( array $params ): array {
+		$pseudoHandler = $this->getPseudoEntityTypeHandlers()[$params['type']] ?? null;
+		if ( $pseudoHandler !== null ) {
+			return $pseudoHandler( $params );
+		}
+
 		try {
 			$searchResults = $this->entitySearchHelper->getRankedSearchResults(
 				$params['search'],
@@ -346,7 +367,10 @@ class SearchEntities extends ApiBase {
 				ParamValidator::PARAM_DEFAULT => false,
 			],
 			'type' => [
-				ParamValidator::PARAM_TYPE => $this->enabledEntityTypes,
+				ParamValidator::PARAM_TYPE => array_merge(
+					$this->enabledEntityTypes,
+					array_keys( $this->getPseudoEntityTypeHandlers() )
+				),
 				ParamValidator::PARAM_DEFAULT => 'item',
 			],
 			'limit' => [
