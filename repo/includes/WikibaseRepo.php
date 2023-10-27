@@ -54,6 +54,7 @@ use Wikibase\Lib\Normalization\ReferenceNormalizer;
 use Wikibase\Lib\Normalization\SnakNormalizer;
 use Wikibase\Lib\Normalization\StatementNormalizer;
 use Wikibase\Lib\Normalization\StringValueNormalizer;
+use Wikibase\Lib\PseudoEntityIdParser;
 use Wikibase\Lib\Rdbms\RepoDomainDbFactory;
 use Wikibase\Lib\SettingsArray;
 use Wikibase\Lib\Store\EntityArticleIdLookup;
@@ -1088,6 +1089,13 @@ class WikibaseRepo {
 	): ItemDisambiguationFactory {
 		return ( $services ?: MediaWikiServices::getInstance() )
 			->get( 'WikibaseRepo.ItemDisambiguationFactory' );
+	}
+
+	public static function getPseudoEntityIdParser(
+		ContainerInterface $services = null
+	): PseudoEntityIdParser {
+		return ( $services ?: MediaWikiServices::getInstance() )
+			->get( 'WikibaseRepo.PseudoEntityIdParser' );
 	}
 
 }

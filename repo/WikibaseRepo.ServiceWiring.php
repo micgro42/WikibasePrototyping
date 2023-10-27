@@ -91,6 +91,7 @@ use Wikibase\Lib\Normalization\ReferenceNormalizer;
 use Wikibase\Lib\Normalization\SnakNormalizer;
 use Wikibase\Lib\Normalization\StatementNormalizer;
 use Wikibase\Lib\Normalization\StringValueNormalizer;
+use Wikibase\Lib\PseudoEntityIdParser;
 use Wikibase\Lib\Rdbms\DomainDb;
 use Wikibase\Lib\Rdbms\RepoDomainDbFactory;
 use Wikibase\Lib\ServiceBySourceAndTypeDispatcher;
@@ -501,7 +502,7 @@ return [
 				// TODO this should perhaps be factored out into a class
 				if ( isset( $value['id'] ) ) {
 					try {
-						return new EntityIdValue( WikibaseRepo::getEntityIdParser( $services )->parse( $value['id'] ) );
+						return new EntityIdValue( WikibaseRepo::getPseudoEntityIdParser( $services )->parse( $value['id'] ) );
 					} catch ( EntityIdParsingException $parsingException ) {
 						if ( is_string( $value['id'] ) ) {
 							$message = 'Can not parse id \'' . $value['id'] . '\' to build EntityIdValue with';
@@ -1642,6 +1643,13 @@ return [
 
 	'WikibaseRepo.PropertyValueExpertsModule' => function ( MediaWikiServices $services ): PropertyValueExpertsModule {
 		return new PropertyValueExpertsModule( WikibaseRepo::getDataTypeDefinitions( $services ) );
+	},
+
+	'WikibaseRepo.PseudoEntityIdParser' => function ( MediaWikiServices $services ): PseudoEntityIdParser {
+		return new PseudoEntityIdParser(
+			$services->getHookContainer(),
+			WikibaseRepo::getEntityIdParser( $services )
+		);
 	},
 
 	'WikibaseRepo.RdfBuilderFactory' => function ( MediaWikiServices $services ): RdfBuilderFactory {

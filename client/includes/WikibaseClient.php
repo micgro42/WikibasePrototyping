@@ -56,6 +56,7 @@ use Wikibase\Lib\Formatters\WikibaseSnakFormatterBuilders;
 use Wikibase\Lib\Formatters\WikibaseValueFormatterBuilders;
 use Wikibase\Lib\LanguageFallbackChainFactory;
 use Wikibase\Lib\MessageInLanguageProvider;
+use Wikibase\Lib\PseudoEntityIdParser;
 use Wikibase\Lib\Rdbms\ClientDomainDbFactory;
 use Wikibase\Lib\Rdbms\RepoDomainDbFactory;
 use Wikibase\Lib\SettingsArray;
@@ -544,6 +545,13 @@ final class WikibaseClient {
 	): FallbackLabelDescriptionLookupFactory {
 		return ( $services ?: MediaWikiServices::getInstance() )
 			->get( 'WikibaseClient.FallbackLabelDescriptionLookupFactory' );
+	}
+
+	public static function getPseudoEntityIdParser(
+		ContainerInterface $services = null
+	): PseudoEntityIdParser {
+		return ( $services ?: MediaWikiServices::getInstance() )
+			->get( 'WikibaseClient.PseudoEntityIdParser' );
 	}
 
 }

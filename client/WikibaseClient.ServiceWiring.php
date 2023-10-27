@@ -99,6 +99,7 @@ use Wikibase\Lib\LanguageNameLookupFactory;
 use Wikibase\Lib\MediaWikiMessageInLanguageProvider;
 use Wikibase\Lib\MessageInLanguageProvider;
 use Wikibase\Lib\PropertyInfoDataTypeLookup;
+use Wikibase\Lib\PseudoEntityIdParser;
 use Wikibase\Lib\Rdbms\ClientDomainDbFactory;
 use Wikibase\Lib\Rdbms\DomainDb;
 use Wikibase\Lib\Rdbms\RepoDomainDbFactory;
@@ -271,7 +272,7 @@ return [
 			'time' => TimeValue::class,
 			'wikibase-entityid' => function ( $value ) use ( $services ) {
 				return isset( $value['id'] )
-					? new EntityIdValue( WikibaseClient::getEntityIdParser( $services )->parse( $value['id'] ) )
+					? new EntityIdValue( WikibaseClient::getPseudoEntityIdParser( $services )->parse( $value['id'] ) )
 					: EntityIdValue::newFromArray( $value );
 			},
 		] );
@@ -769,6 +770,13 @@ return [
 		}
 
 		return $propertySource;
+	},
+
+	'WikibaseClient.PseudoEntityIdParser' => function ( MediaWikiServices $services ): PseudoEntityIdParser {
+		return new PseudoEntityIdParser(
+			$services->getHookContainer(),
+			WikibaseClient::getEntityIdParser( $services )
+		);
 	},
 
 	'WikibaseClient.RecentChangeFactory' => function ( MediaWikiServices $services ): RecentChangeFactory {

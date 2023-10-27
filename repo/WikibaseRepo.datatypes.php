@@ -371,7 +371,7 @@ return call_user_func( function() {
 				return $factory->buildEntityValidators();
 			},
 			'parser-factory-callback' => function ( ParserOptions $options ) {
-				$entityIdParser = WikibaseRepo::getEntityIdParser();
+				$entityIdParser = WikibaseRepo::getPseudoEntityIdParser();
 				return new EntityIdValueParser( $entityIdParser );
 			},
 			'formatter-factory-callback' => function( $format, FormatterOptions $options ) {
