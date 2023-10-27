@@ -4,12 +4,14 @@ namespace Wikibase\Client\DataAccess;
 
 use InvalidArgumentException;
 use Language;
+use MediaWiki\MediaWikiServices;
 use ValueFormatters\FormatterOptions;
 use Wikibase\Client\Usage\UsageAccumulator;
 use Wikibase\Client\Usage\UsageTrackingLanguageFallbackLabelDescriptionLookup;
 use Wikibase\Client\Usage\UsageTrackingSnakFormatter;
 use Wikibase\DataModel\Entity\EntityIdParser;
 use Wikibase\DataModel\Services\Lookup\PropertyDataTypeLookup;
+use Wikibase\DataModel\Snak\Snak;
 use Wikibase\Lib\Formatters\BinaryOptionDispatchingSnakFormatter;
 use Wikibase\Lib\Formatters\EscapingSnakFormatter;
 use Wikibase\Lib\Formatters\FormatterLabelDescriptionLookupFactory;
@@ -123,7 +125,7 @@ class DataAccessSnakFormatterFactory {
 			$snakFormatter = $this->getPlainTextSnakFormatterForOptions( $options );
 		}
 
-		return new UsageTrackingSnakFormatter(
+		$usageTrackingSnakFormatter = new UsageTrackingSnakFormatter(
 			$snakFormatter,
 			$usageAccumulator,
 			$this->repoItemUriParser,
@@ -134,6 +136,30 @@ class DataAccessSnakFormatterFactory {
 				$this->trackUsagesInAllLanguages
 			)
 		);
+
+		return new class( $usageTrackingSnakFormatter ) implements SnakFormatter { // TODO real class
+
+			private SnakFormatter $snakFormatter;
+
+			public function __construct( SnakFormatter $snakFormatter ) {
+				$this->snakFormatter = $snakFormatter;
+			}
+
+			public function formatSnak( Snak $snak ) {
+				$runner = MediaWikiServices::getInstance()->getHookContainer(); // TODO inject
+				if ( !$runner->run( // TODO maybe use a hook interface
+					'WikibasePseudoEntities_SnakFormatter_formatSnak',
+					[ $snak, &$out ]
+				) ) {
+					return $out;
+				}
+				return $this->snakFormatter->formatSnak( $snak );
+			}
+
+			public function getFormat() {
+				return $this->snakFormatter->getFormat();
+			}
+		};
 	}
 
 	/**
