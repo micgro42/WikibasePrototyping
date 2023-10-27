@@ -3,6 +3,7 @@
 namespace Wikibase\Repo\ParserOutput;
 
 use MediaWiki\Cache\LinkBatchFactory;
+use MediaWiki\MediaWikiServices;
 use MediaWiki\Title\Title;
 use ParserOutput;
 use Wikibase\DataModel\Entity\EntityDocument;
@@ -60,6 +61,11 @@ class ReferencedEntitiesDataUpdater implements EntityParserOutputUpdater {
 		$linkBatch->setCaller( __METHOD__ );
 
 		foreach ( $entityIds as $entityId ) {
+			$runner = MediaWikiServices::getInstance()->getHookContainer(); // TODO inject
+			// TODO maybe use a hook interface
+			if ( !$runner->run( 'WikibasePseudoEntities_ReferencedEntities_LinkBatch', [ $entityId, $linkBatch ] ) ) {
+				continue;
+			}
 			$linkBatch->addObj( $this->entityTitleLookup->getTitleForId( $entityId ) );
 		}
 
