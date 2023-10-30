@@ -6,6 +6,7 @@ use MediaWiki\Cache\LinkBatchFactory;
 use MediaWiki\Title\Title;
 use ParserOutput;
 use Wikibase\DataModel\Entity\EntityDocument;
+use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\Lib\Store\EntityTitleLookup;
 use Wikibase\Repo\EntityReferenceExtractors\EntityReferenceExtractor;
 
@@ -60,7 +61,10 @@ class ReferencedEntitiesDataUpdater implements EntityParserOutputUpdater {
 		$linkBatch->setCaller( __METHOD__ );
 
 		foreach ( $entityIds as $entityId ) {
-			$linkBatch->addObj( $this->entityTitleLookup->getTitleForId( $entityId ) );
+			if ( $entityId instanceof EntityId ) {
+				$linkBatch->addObj( $this->entityTitleLookup->getTitleForId( $entityId ) );
+			}
+			// FIXME: what behavior do we want for PseudoEntityIds?
 		}
 
 		$pages = $linkBatch->doQuery();
