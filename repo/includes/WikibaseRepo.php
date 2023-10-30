@@ -20,6 +20,7 @@ use Wikibase\DataAccess\PrefetchingTermLookup;
 use Wikibase\DataAccess\WikibaseServices;
 use Wikibase\DataModel\Deserializers\DeserializerFactory;
 use Wikibase\DataModel\Entity\EntityIdParser;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\DataModel\Services\Diff\EntityDiffer;
 use Wikibase\DataModel\Services\Diff\EntityPatcher;
@@ -1088,6 +1089,13 @@ class WikibaseRepo {
 	): ItemDisambiguationFactory {
 		return ( $services ?: MediaWikiServices::getInstance() )
 			->get( 'WikibaseRepo.ItemDisambiguationFactory' );
+	}
+
+	public static function getPseudoEntityIdParser(
+		ContainerInterface $services = null
+	): PseudoEntityIdParser {
+		return ( $services ?: MediaWikiServices::getInstance() )
+			->get( 'WikibaseRepo.PseudoEntityIdParser' );
 	}
 
 }
