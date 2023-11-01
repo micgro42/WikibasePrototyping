@@ -34,6 +34,7 @@ use Wikibase\DataAccess\PrefetchingTermLookup;
 use Wikibase\DataAccess\WikibaseServices;
 use Wikibase\DataModel\Deserializers\DeserializerFactory;
 use Wikibase\DataModel\Entity\EntityIdParser;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\DataModel\Services\Diff\EntityDiffer;
 use Wikibase\DataModel\Services\EntityId\EntityIdComposer;
@@ -544,6 +545,13 @@ final class WikibaseClient {
 	): FallbackLabelDescriptionLookupFactory {
 		return ( $services ?: MediaWikiServices::getInstance() )
 			->get( 'WikibaseClient.FallbackLabelDescriptionLookupFactory' );
+	}
+
+	public static function getPseudoEntityIdParser(
+		ContainerInterface $services = null
+	): PseudoEntityIdParser {
+		return ( $services ?: MediaWikiServices::getInstance() )
+			->get( 'WikibaseClient.PseudoEntityIdParser' );
 	}
 
 }

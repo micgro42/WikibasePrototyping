@@ -70,6 +70,10 @@ class UsageTrackingSnakFormatter implements SnakFormatter {
 			// WikibaseValueFormatterBuilders and what the individual formatters actually use.
 			if ( $value instanceof EntityIdValue ) {
 				$entityId = $value->getEntityId();
+				if ( !( $entityId instanceof EntityId ) ) {
+					// TODO add hook here when we want to allow showing the label
+					return $entityId->getSerialization();
+				}
 				$this->addLabelUsage( $entityId );
 
 				// This title usage aspect must be kept in sync with what the formatters from

@@ -62,11 +62,13 @@ use Wikibase\DataAccess\SourceAndTypeDispatchingPrefetchingTermLookup;
 use Wikibase\DataAccess\WikibaseServices;
 use Wikibase\DataModel\Deserializers\DeserializerFactory;
 use Wikibase\DataModel\Entity\DispatchingEntityIdParser;
+use Wikibase\DataModel\Entity\DispatchingPseudoEntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdValue;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemIdParser;
 use Wikibase\DataModel\Entity\Property;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 use Wikibase\DataModel\Serializers\SerializerFactory;
 use Wikibase\DataModel\Services\Diff\EntityDiffer;
 use Wikibase\DataModel\Services\EntityId\EntityIdComposer;
@@ -271,7 +273,7 @@ return [
 			'time' => TimeValue::class,
 			'wikibase-entityid' => function ( $value ) use ( $services ) {
 				return isset( $value['id'] )
-					? new EntityIdValue( WikibaseClient::getEntityIdParser( $services )->parse( $value['id'] ) )
+					? new EntityIdValue( WikibaseClient::getPseudoEntityIdParser( $services )->parse( $value['id'] ) )
 					: EntityIdValue::newFromArray( $value );
 			},
 		] );
@@ -772,6 +774,24 @@ return [
 		}
 
 		return $propertySource;
+	},
+
+	'WikibaseClient.PseudoEntityIdParser' => function ( MediaWikiServices $services ): PseudoEntityIdParser {
+		$vanillaEntityIdParser = WikibaseClient::getEntityIdParser( $services );
+		$hookContainer = $services->getHookContainer();
+		$pseudoIdBuilders = [];
+		// TODO: this should use a proper hook interface that explains the expected behavior
+		$hookContainer->run(
+			'WikibasePseudoEntities_PseudoEntityIdParser',
+			[ &$pseudoIdBuilders ]
+		);
+
+		$dispatchingPseudoEntityIdParser = new DispatchingPseudoEntityIdParser(
+			$vanillaEntityIdParser,
+			$pseudoIdBuilders
+		);
+
+		return $dispatchingPseudoEntityIdParser;
 	},
 
 	'WikibaseClient.RecentChangeFactory' => function ( MediaWikiServices $services ): RecentChangeFactory {
