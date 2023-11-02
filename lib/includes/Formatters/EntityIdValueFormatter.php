@@ -4,6 +4,7 @@ namespace Wikibase\Lib\Formatters;
 
 use InvalidArgumentException;
 use ValueFormatters\ValueFormatter;
+use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\EntityIdValue;
 use Wikibase\DataModel\Services\EntityId\EntityIdFormatter;
 
@@ -41,7 +42,17 @@ class EntityIdValueFormatter implements ValueFormatter {
 			throw new InvalidArgumentException( 'Data value type mismatch. Expected an EntityIdValue.' );
 		}
 
-		return $this->entityIdFormatter->formatEntityId( $value->getEntityId() );
+		$entityId = $value->getEntityId();
+		if ( !( $entityId instanceof EntityId ) ) {
+			/**
+			 * TODO: Now that EntitySchema have a wikibase-entityid datavalue-type should they
+			 *       maybe return this EntityIdValueFormatter in the `formatter-factory-callback`
+			 *       callback as well?
+			 */
+			throw new InvalidArgumentException( 'FIXME' );
+		}
+
+		return $this->entityIdFormatter->formatEntityId( $entityId );
 	}
 
 }
