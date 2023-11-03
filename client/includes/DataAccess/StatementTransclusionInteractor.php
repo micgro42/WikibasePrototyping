@@ -6,6 +6,7 @@ use Language;
 use Wikibase\Client\PropertyLabelNotResolvedException;
 use Wikibase\Client\Usage\UsageAccumulator;
 use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 use Wikibase\DataModel\Services\Lookup\EntityLookup;
 use Wikibase\DataModel\Services\Lookup\UnresolvedEntityRedirectException;
 use Wikibase\DataModel\Snak\Snak;
@@ -67,7 +68,7 @@ class StatementTransclusionInteractor {
 	}
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 * @param string $propertyLabelOrId property label or ID (pXXX)
 	 * @param int[]|null $acceptableRanks
 	 *
@@ -75,10 +76,14 @@ class StatementTransclusionInteractor {
 	 * @return string Wikitext
 	 */
 	public function render(
-		EntityId $entityId,
+		IndeterminateEntityId $entityId,
 		$propertyLabelOrId,
 		array $acceptableRanks = null
 	) {
+		if ( !( $entityId instanceof EntityId ) ) {
+			// TODO: PseudoEntities do not support statements *yet*. See T345745
+			return '';
+		}
 		try {
 			$entity = $this->entityLookup->getEntity( $entityId );
 		} catch ( UnresolvedEntityRedirectException $ex ) {

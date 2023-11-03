@@ -6,6 +6,7 @@ namespace Wikibase\Client\Usage;
 
 use InvalidArgumentException;
 use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 
 /**
  * Value object representing the usage of an entity. This includes information about
@@ -89,7 +90,7 @@ class EntityUsage {
 	];
 
 	/**
-	 * @var EntityId
+	 * @var IndeterminateEntityId
 	 */
 	private $entityId;
 
@@ -109,14 +110,14 @@ class EntityUsage {
 	private $identity;
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 * @param string $aspect use the EntityUsage::XXX_USAGE constants
 	 * @param string|null $modifier for further qualifying the usage aspect (e.g. a language code
 	 *        may be used along with the LABEL_USAGE aspect.
 	 *
 	 * @throws InvalidArgumentException
 	 */
-	public function __construct( EntityId $entityId, string $aspect, ?string $modifier = null ) {
+	public function __construct( IndeterminateEntityId $entityId, string $aspect, ?string $modifier = null ) {
 		if ( !array_key_exists( $aspect, self::$aspects ) ) {
 			throw new InvalidArgumentException( '$aspect must use one of the XXX_USAGE constants, "' . $aspect . '" given!' );
 		}
@@ -143,7 +144,7 @@ class EntityUsage {
 		return self::makeAspectKey( $this->aspect, $this->modifier );
 	}
 
-	public function getEntityId(): EntityId {
+	public function getEntityId(): IndeterminateEntityId {
 		return $this->entityId;
 	}
 

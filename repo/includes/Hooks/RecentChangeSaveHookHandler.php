@@ -8,6 +8,7 @@ use CentralIdLookup;
 use MediaWiki\MediaWikiServices;
 use MediaWiki\User\CentralId\CentralIdLookupFactory;
 use RecentChange;
+use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\Lib\Changes\Change;
 use Wikibase\Lib\Changes\ChangeRow;
 use Wikibase\Lib\Changes\ChangeStore;
@@ -92,6 +93,11 @@ class RecentChangeSaveHookHandler {
 			return;
 		}
 
+		if ( !( $change->getEntityId() instanceof EntityId ) ) {
+			// Pseudo-entities will take care of their own dispatching for now
+			return;
+		}
+
 		if ( !$this->changeNeedsDispatching( $change ) ) {
 			return;
 		}
@@ -110,6 +116,7 @@ class RecentChangeSaveHookHandler {
 	}
 
 	private function setChangeMetaData( EntityChange $change, RecentChange $rc, int $centralUserId ): void {
+		// ! If this is ever touched, also change it in EntitySchema!
 		$change->setFields( [
 			ChangeRow::REVISION_ID => $rc->getAttribute( 'rc_this_oldid' ),
 			ChangeRow::TIME => $rc->getAttribute( 'rc_timestamp' ),

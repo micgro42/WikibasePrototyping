@@ -5,7 +5,7 @@ declare( strict_types = 1 );
 namespace Wikibase\Client\Usage;
 
 use Traversable;
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 
 /**
  * Service interface looking up the usage of entities across pages on the local wiki.
@@ -32,7 +32,7 @@ interface UsageLookup {
 	/**
 	 * Returns the pages that use any of the given entities.
 	 *
-	 * @param EntityId[] $entityIds
+	 * @param IndeterminateEntityId[] $entityIds
 	 * @param string[] $aspects Which aspects to consider (if omitted, all aspects are considered).
 	 * Use the EntityUsage::XXX_USAGE constants to represent aspects.
 	 *
@@ -47,9 +47,9 @@ interface UsageLookup {
 	 * question which of a given list of entities are currently being used on
 	 * wiki pages.
 	 *
-	 * @param EntityId[] $entityIds
+	 * @param IndeterminateEntityId[] $entityIds
 	 *
-	 * @return EntityId[] A list of elements of $entityIds that are unused.
+	 * @return IndeterminateEntityId[] A list of elements of $entityIds that are unused.
 	 */
 	public function getUnusedEntities( array $entityIds ): array;
 

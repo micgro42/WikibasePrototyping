@@ -10,8 +10,8 @@ use Traversable;
 use Wikibase\Client\Usage\EntityUsage;
 use Wikibase\Client\Usage\UsageLookup;
 use Wikibase\Client\Usage\UsageTracker;
-use Wikibase\DataModel\Entity\EntityId;
-use Wikibase\DataModel\Entity\EntityIdParser;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 use Wikimedia\Rdbms\IDatabase;
 use Wikimedia\Rdbms\SessionConsistentConnectionManager;
 
@@ -23,7 +23,7 @@ use Wikimedia\Rdbms\SessionConsistentConnectionManager;
  */
 class SqlUsageTracker implements UsageTracker, UsageLookup {
 
-	private EntityIdParser $idParser;
+	private PseudoEntityIdParser $idParser;
 
 	private SessionConsistentConnectionManager $connectionManager;
 
@@ -46,14 +46,14 @@ class SqlUsageTracker implements UsageTracker, UsageLookup {
 	private int $addEntityUsagesBatchSize;
 
 	/**
-	 * @param EntityIdParser $idParser
+	 * @param PseudoEntityIdParser $idParser
 	 * @param SessionConsistentConnectionManager $connectionManager
 	 * @param string[] $disabledUsageAspects
 	 * @param int $entityUsagePerPageLimit
 	 * @param int $addEntityUsagesBatchSize
 	 */
 	public function __construct(
-		EntityIdParser $idParser,
+		PseudoEntityIdParser $idParser,
 		SessionConsistentConnectionManager $connectionManager,
 		array $disabledUsageAspects,
 		int $entityUsagePerPageLimit,
@@ -225,7 +225,7 @@ class SqlUsageTracker implements UsageTracker, UsageLookup {
 	/**
 	 * @see UsageLookup::getPagesUsing
 	 *
-	 * @param EntityId[] $entityIds
+	 * @param IndeterminateEntityId[] $entityIds
 	 * @param string[] $aspects
 	 *
 	 * @return Traversable A traversable over PageEntityUsages grouped by page.
@@ -244,9 +244,9 @@ class SqlUsageTracker implements UsageTracker, UsageLookup {
 	/**
 	 * @see UsageLookup::getUnusedEntities
 	 *
-	 * @param EntityId[] $entityIds
+	 * @param IndeterminateEntityId[] $entityIds
 	 *
-	 * @return EntityId[]
+	 * @return IndeterminateEntityId[]
 	 */
 	public function getUnusedEntities( array $entityIds ): array {
 		if ( empty( $entityIds ) ) {

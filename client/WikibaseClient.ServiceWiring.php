@@ -353,7 +353,7 @@ return [
 
 		return new EntityChangeFactory(
 			WikibaseClient::getEntityDiffer( $services ),
-			WikibaseClient::getEntityIdParser( $services ),
+			WikibaseClient::getPseudoEntityIdParser( $services ),
 			$changeClasses,
 			EntityChange::class,
 			WikibaseClient::getLogger( $services )
@@ -977,7 +977,7 @@ return [
 
 	'WikibaseClient.Store' => function ( MediaWikiServices $services ): ClientStore {
 		return new DirectSqlStore(
-			WikibaseClient::getEntityIdParser( $services ),
+			WikibaseClient::getPseudoEntityIdParser( $services ),
 			WikibaseClient::getEntityIdLookup( $services ),
 			WikibaseClient::getWikibaseServices( $services ),
 			WikibaseClient::getSettings( $services ),
@@ -1039,7 +1039,7 @@ return [
 			'entityUsageModifierLimits'
 		);
 		return new UsageAccumulatorFactory(
-			new EntityUsageFactory( WikibaseClient::getEntityIdParser( $services ) ),
+			new EntityUsageFactory( WikibaseClient::getPseudoEntityIdParser( $services ) ),
 			new UsageDeduplicator( $usageModifierLimits ),
 			new RevisionBasedEntityRedirectTargetLookup(
 				WikibaseClient::getEntityRevisionLookup( $services )

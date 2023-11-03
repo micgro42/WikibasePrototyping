@@ -4,7 +4,7 @@ declare( strict_types = 1 );
 
 namespace Wikibase\Client\Usage;
 
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 
 /**
  * Service interface for tracking subscriptions of clients to entity
@@ -21,7 +21,7 @@ interface SubscriptionManager {
 	 * Subscribes the given subscriber to notifications about changes on the specified entities.
 	 *
 	 * @param string $subscriber Global site ID of the subscriber
-	 * @param EntityId[] $entityIds The entities to subscribe to.
+	 * @param IndeterminateEntityId[] $entityIds The entities to subscribe to.
 	 */
 	public function subscribe( string $subscriber, array $entityIds ): void;
 
@@ -29,7 +29,7 @@ interface SubscriptionManager {
 	 * Unsubscribes the given subscriber from notifications about changes on the specified entities.
 	 *
 	 * @param string $subscriber Global site ID of the subscriber
-	 * @param EntityId[] $entityIds The entities to subscribe to.
+	 * @param IndeterminateEntityId[] $entityIds The entities to subscribe to.
 	 */
 	public function unsubscribe( string $subscriber, array $entityIds ): void;
 

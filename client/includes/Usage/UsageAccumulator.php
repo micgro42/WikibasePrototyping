@@ -3,6 +3,7 @@
 namespace Wikibase\Client\Usage;
 
 use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 use Wikibase\DataModel\Entity\NumericPropertyId;
 
 /**
@@ -24,20 +25,20 @@ abstract class UsageAccumulator {
 	/**
 	 * Registers the usage of an entity's label (in the given language).
 	 *
-	 * @param EntityId $id
+	 * @param IndeterminateEntityId $id
 	 * @param string|null $languageCode
 	 */
-	public function addLabelUsage( EntityId $id, $languageCode = null ) {
+	public function addLabelUsage( IndeterminateEntityId $id, $languageCode = null ) {
 		$this->addUsage( new EntityUsage( $id, EntityUsage::LABEL_USAGE, $languageCode ) );
 	}
 
 	/**
 	 * Registers the usage of an entity's description (in the given language).
 	 *
-	 * @param EntityId $id
+	 * @param IndeterminateEntityId $id
 	 * @param string|null $languageCode
 	 */
-	public function addDescriptionUsage( EntityId $id, $languageCode = null ) {
+	public function addDescriptionUsage( IndeterminateEntityId $id, $languageCode = null ) {
 		$this->addUsage( new EntityUsage( $id, EntityUsage::DESCRIPTION_USAGE, $languageCode ) );
 	}
 
@@ -46,9 +47,9 @@ abstract class UsageAccumulator {
 	 * i.e. the title of the local (client) page linked to the entity,
 	 * e.g. to refer to the corresponding page on the local wiki.
 	 *
-	 * @param EntityId $id
+	 * @param IndeterminateEntityId $id
 	 */
-	public function addTitleUsage( EntityId $id ) {
+	public function addTitleUsage( IndeterminateEntityId $id ) {
 		$this->addUsage( new EntityUsage( $id, EntityUsage::TITLE_USAGE ) );
 	}
 
@@ -76,9 +77,9 @@ abstract class UsageAccumulator {
 	 * entity (e.g. access to statements or labels in labels a language other
 	 * than the content language).
 	 *
-	 * @param EntityId $id
+	 * @param IndeterminateEntityId $id
 	 */
-	public function addOtherUsage( EntityId $id ) {
+	public function addOtherUsage( IndeterminateEntityId $id ) {
 		$this->addUsage( new EntityUsage( $id, EntityUsage::OTHER_USAGE ) );
 	}
 
@@ -86,9 +87,9 @@ abstract class UsageAccumulator {
 	 * Registers the usage of any/all data of an entity (e.g. when accessed
 	 * programmatically using Lua).
 	 *
-	 * @param EntityId $id
+	 * @param IndeterminateEntityId $id
 	 */
-	public function addAllUsage( EntityId $id ) {
+	public function addAllUsage( IndeterminateEntityId $id ) {
 		$this->addUsage( new EntityUsage( $id, EntityUsage::ALL_USAGE ) );
 	}
 

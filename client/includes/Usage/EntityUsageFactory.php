@@ -5,7 +5,7 @@ declare( strict_types = 1 );
 namespace Wikibase\Client\Usage;
 
 use InvalidArgumentException;
-use Wikibase\DataModel\Entity\EntityIdParser;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 
 /**
  * Factory service for generating EntityUsage objects based on their identity strings.
@@ -16,11 +16,11 @@ use Wikibase\DataModel\Entity\EntityIdParser;
 class EntityUsageFactory {
 
 	/**
-	 * @var EntityIdParser
+	 * @var PseudoEntityIdParser
 	 */
 	private $entityIdParser;
 
-	public function __construct( EntityIdParser $entityIdParser ) {
+	public function __construct( PseudoEntityIdParser $entityIdParser ) {
 		$this->entityIdParser = $entityIdParser;
 	}
 

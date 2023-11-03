@@ -2,7 +2,7 @@
 
 namespace Wikibase\Lib\Store;
 
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 use Wikibase\DataModel\Services\Lookup\LabelDescriptionLookup;
 use Wikibase\DataModel\Services\Lookup\LabelDescriptionLookupException;
 use Wikibase\DataModel\Term\TermFallback;
@@ -20,19 +20,19 @@ use Wikibase\DataModel\Term\TermFallback;
 interface FallbackLabelDescriptionLookup extends LabelDescriptionLookup {
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 *
 	 * @throws LabelDescriptionLookupException
 	 * @return TermFallback|null
 	 */
-	public function getLabel( EntityId $entityId );
+	public function getLabel( IndeterminateEntityId $entityId );
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 *
 	 * @throws LabelDescriptionLookupException
 	 * @return TermFallback|null
 	 */
-	public function getDescription( EntityId $entityId );
+	public function getDescription( IndeterminateEntityId $entityId );
 
 }

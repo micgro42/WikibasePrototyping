@@ -3,10 +3,10 @@
 namespace Wikibase\Client\Usage;
 
 use DataValues\UnboundedQuantityValue;
-use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\EntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdParsingException;
 use Wikibase\DataModel\Entity\EntityIdValue;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 use Wikibase\DataModel\Snak\PropertyValueSnak;
 use Wikibase\DataModel\Snak\Snak;
 use Wikibase\Lib\Formatters\SnakFormatter;
@@ -70,10 +70,7 @@ class UsageTrackingSnakFormatter implements SnakFormatter {
 			// WikibaseValueFormatterBuilders and what the individual formatters actually use.
 			if ( $value instanceof EntityIdValue ) {
 				$entityId = $value->getEntityId();
-				if ( !( $entityId instanceof EntityId ) ) {
-					// TODO add hook here when we want to allow showing the label
-					return $entityId->getSerialization();
-				}
+
 				$this->addLabelUsage( $entityId );
 
 				// This title usage aspect must be kept in sync with what the formatters from
@@ -97,7 +94,7 @@ class UsageTrackingSnakFormatter implements SnakFormatter {
 		return $this->snakFormatter->formatSnak( $snak );
 	}
 
-	private function addLabelUsage( EntityId $id ) {
+	private function addLabelUsage( IndeterminateEntityId $id ) {
 		// Just get the label from UsageTrackingLanguageFallbackLabelDescriptionLookup::getLabel,
 		// which will record the appropriate usage(s) for us.
 		$this->usageTrackingLabelDescriptionLookup->getLabel( $id );

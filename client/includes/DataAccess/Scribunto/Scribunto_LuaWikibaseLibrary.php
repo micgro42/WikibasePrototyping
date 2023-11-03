@@ -19,9 +19,10 @@ use Wikibase\Client\Usage\UsageAccumulator;
 use Wikibase\Client\Usage\UsageTrackingLanguageFallbackLabelDescriptionLookup;
 use Wikibase\Client\WikibaseClient;
 use Wikibase\DataModel\Entity\EntityId;
-use Wikibase\DataModel\Entity\EntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdParsingException;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 use Wikibase\DataModel\Services\Lookup\EntityAccessLimitException;
 use Wikibase\DataModel\Services\Lookup\EntityRetrievingClosestReferencedEntityIdLookup;
 use Wikibase\Lib\EntityTypeDefinitions;
@@ -77,7 +78,7 @@ class Scribunto_LuaWikibaseLibrary extends Scribunto_LuaLibraryBase {
 	private $propertyOrderProvider = null;
 
 	/**
-	 * @var EntityIdParser|null
+	 * @var PseudoEntityIdParser|null
 	 */
 	private $entityIdParser = null;
 
@@ -312,9 +313,9 @@ class Scribunto_LuaWikibaseLibrary extends Scribunto_LuaLibraryBase {
 		);
 	}
 
-	private function getEntityIdParser(): EntityIdParser {
+	private function getEntityIdParser(): PseudoEntityIdParser {
 		if ( !$this->entityIdParser ) {
-			$this->entityIdParser = WikibaseClient::getEntityIdParser();
+			$this->entityIdParser = WikibaseClient::getPseudoEntityIdParser();
 		}
 		return $this->entityIdParser;
 	}
@@ -322,7 +323,7 @@ class Scribunto_LuaWikibaseLibrary extends Scribunto_LuaLibraryBase {
 	/**
 	 * @throws ScribuntoException
 	 */
-	private function parseUserGivenEntityId( string $idSerialization ): EntityId {
+	private function parseUserGivenEntityId( string $idSerialization ): IndeterminateEntityId {
 		try {
 			return $this->getEntityIdParser()->parse( $idSerialization );
 		} catch ( EntityIdParsingException $ex ) {
@@ -436,6 +437,18 @@ class Scribunto_LuaWikibaseLibrary extends Scribunto_LuaLibraryBase {
 
 		if ( !( $propertyId instanceof PropertyId ) ) {
 			return [ null ];
+		}
+
+		if ( !( $fromId instanceof EntityId ) ) {
+			return [ false ];
+		}
+		// FIXME: phan does not understand the filter below, add phan-override here
+		if ( array_filter( $toIds, function ( $toId ) {
+			return !( $toId instanceof EntityId );
+		} ) ) {
+			return [ false ];
+		} else {
+			'@phan-var array<EntityId> $toIds';
 		}
 
 		return [

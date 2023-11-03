@@ -38,11 +38,15 @@ class RedirectTrackingUsageAccumulator extends UsageAccumulator {
 	 */
 	public function addUsage( EntityUsage $usage ) {
 
-		$redirectTarget = $this->entityRedirectTargetLookup->getRedirectForEntityId( $usage->getEntityId() );
-		if ( $redirectTarget !== null ) {
-			$this->addRedirectTargetUsage( $redirectTarget, $usage->getAspect(), $usage->getModifier() );
-			$this->addRedirectSourceUsage( $usage->getEntityId() );
-			return;
+		$usageEntityId = $usage->getEntityId();
+		if ( $usageEntityId instanceof EntityId ) {
+			// TODO: decide if we want to support & track redirects on PseudoEntities
+			$redirectTarget = $this->entityRedirectTargetLookup->getRedirectForEntityId( $usageEntityId );
+			if ( $redirectTarget !== null ) {
+				$this->addRedirectTargetUsage( $redirectTarget, $usage->getAspect(), $usage->getModifier() );
+				$this->addRedirectSourceUsage( $usageEntityId );
+				return;
+			}
 		}
 
 		$this->innerUsageAccumulator->addUsage( $usage );

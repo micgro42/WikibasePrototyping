@@ -6,7 +6,7 @@ namespace Wikibase\Lib\Changes;
 
 use Exception;
 use Wikibase\DataModel\Entity\BasicEntityIdParser;
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 
 /**
  * Represents a change for an entity; to be extended by various change subtypes
@@ -24,13 +24,13 @@ class EntityChange extends DiffChange {
 	public const REMOVE = 'remove';
 	public const RESTORE = 'restore';
 
-	private ?EntityId $entityId = null;
+	private ?IndeterminateEntityId $entityId = null;
 
 	public function getType(): string {
 		return $this->getField( ChangeRow::TYPE );
 	}
 
-	public function getEntityId(): EntityId {
+	public function getEntityId(): IndeterminateEntityId {
 		if ( !$this->entityId && $this->hasField( ChangeRow::OBJECT_ID ) ) {
 			// FIXME: this should not happen
 			$this->logger->warning( 'object_id set in EntityChange, but not entityId' );
@@ -44,7 +44,7 @@ class EntityChange extends DiffChange {
 	/**
 	 * Set the Change's entity id (as returned by getEntityId) and the object_id field
 	 */
-	public function setEntityId( EntityId $entityId ): void {
+	public function setEntityId( IndeterminateEntityId $entityId ): void {
 		$this->entityId = $entityId;
 		$this->setField( ChangeRow::OBJECT_ID, $entityId->getSerialization() );
 	}

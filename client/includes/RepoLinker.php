@@ -8,7 +8,7 @@ use Html;
 use InvalidArgumentException;
 use LogicException;
 use Wikibase\DataAccess\EntitySourceDefinitions;
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 
 /**
  * @license GPL-2.0-or-later
@@ -77,13 +77,13 @@ class RepoLinker {
 	/**
 	 * Constructs an html link to an entity
 	 *
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 * @param array $classes
 	 * @param string|null $text Defaults to the entity id serialization.
 	 *
 	 * @return string (html)
 	 */
-	public function buildEntityLink( EntityId $entityId, array $classes = [], string $text = null ): string {
+	public function buildEntityLink( IndeterminateEntityId $entityId, array $classes = [], string $text = null ): string {
 		if ( $text === null ) {
 			$text = $entityId->getSerialization();
 		}
@@ -101,7 +101,7 @@ class RepoLinker {
 		);
 	}
 
-	public function getEntityTitle( EntityId $entityId ): string {
+	public function getEntityTitle( IndeterminateEntityId $entityId ): string {
 		$title = $entityId->getSerialization();
 		return 'Special:EntityPage/' . $title;
 	}
@@ -109,11 +109,11 @@ class RepoLinker {
 	/**
 	 * Constructs a link to an entity
 	 *
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 *
 	 * @return string
 	 */
-	public function getEntityUrl( EntityId $entityId ): string {
+	public function getEntityUrl( IndeterminateEntityId $entityId ): string {
 		$title = $this->getEntityTitle( $entityId );
 		return $this->getPageUrl( $title );
 	}
@@ -121,13 +121,13 @@ class RepoLinker {
 	/**
 	 * Constructs the machine followable link to an entity. E.g., https://www.wikidata.org/entity/Q42.
 	 *
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 *
 	 * @throws LogicException when there is no base URI for the repository $entityId belongs to
 	 *
 	 * @return string
 	 */
-	public function getEntityConceptUri( EntityId $entityId ): string {
+	public function getEntityConceptUri( IndeterminateEntityId $entityId ): string {
 		$baseUri = $this->getConceptBaseUri( $entityId );
 		return $baseUri . '/' . wfUrlencode( $entityId->getSerialization() );
 	}
@@ -137,13 +137,13 @@ class RepoLinker {
 	}
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 *
 	 * @throws LogicException when there is no base URI for the repository $entityId belongs to
 	 *
 	 * @return string
 	 */
-	private function getConceptBaseUri( EntityId $entityId ): string {
+	private function getConceptBaseUri( IndeterminateEntityId $entityId ): string {
 		$uri = null;
 		$source = $this->entitySourceDefinitions->getDatabaseSourceForEntityType( $entityId->getEntityType() );
 		if ( $source !== null ) {

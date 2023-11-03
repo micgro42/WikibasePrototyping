@@ -11,11 +11,11 @@ use TitleFormatter;
 use TitleParser;
 use Wikibase\Client\Usage\UsageAccumulator;
 use Wikibase\DataModel\Entity\EntityId;
-use Wikibase\DataModel\Entity\EntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdParsingException;
 use Wikibase\DataModel\Entity\Item;
 use Wikibase\DataModel\Entity\ItemId;
 use Wikibase\DataModel\Entity\PropertyId;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 use Wikibase\DataModel\Services\Lookup\EntityLookup;
 use Wikibase\DataModel\Services\Lookup\ReferencedEntityIdLookup;
 use Wikibase\DataModel\Services\Lookup\ReferencedEntityIdLookupException;
@@ -61,7 +61,7 @@ class WikibaseLanguageIndependentLuaBindings {
 	private $usageAccumulator;
 
 	/**
-	 * @var EntityIdParser
+	 * @var PseudoEntityIdParser
 	 */
 	private $entityIdParser;
 
@@ -107,7 +107,7 @@ class WikibaseLanguageIndependentLuaBindings {
 		EntityIdLookup $entityIdLookup,
 		SettingsArray $settings,
 		UsageAccumulator $usageAccumulator,
-		EntityIdParser $entityIdParser,
+		PseudoEntityIdParser $entityIdParser,
 		TermLookup $termLookup,
 		ContentLanguages $termsLanguages,
 		ReferencedEntityIdLookup $referencedEntityIdLookup,

@@ -84,7 +84,7 @@ class Scribunto_LuaWikibaseEntityLibrary extends Scribunto_LuaLibraryBase {
 		return new WikibaseLuaEntityBindings(
 			$plainTextTransclusionInteractor,
 			$richWikitextTransclusionInteractor,
-			WikibaseClient::getEntityIdParser(),
+			WikibaseClient::getPseudoEntityIdParser(),
 			WikibaseClient::getTermsLanguages(),
 			$lang,
 			$this->getUsageAccumulator(),

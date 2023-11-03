@@ -4,7 +4,7 @@ namespace Wikibase\DataModel\Services\Lookup;
 
 use Exception;
 use RuntimeException;
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 
 /**
  * @since 2.0
@@ -15,16 +15,16 @@ use Wikibase\DataModel\Entity\EntityId;
 class LabelDescriptionLookupException extends RuntimeException {
 
 	/**
-	 * @var EntityId
+	 * @var IndeterminateEntityId
 	 */
 	private $entityId;
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 * @param string|null $message
 	 * @param Exception|null $previous
 	 */
-	public function __construct( EntityId $entityId, $message = null, Exception $previous = null ) {
+	public function __construct( IndeterminateEntityId $entityId, $message = null, Exception $previous = null ) {
 		$this->entityId = $entityId;
 
 		parent::__construct(
@@ -35,7 +35,7 @@ class LabelDescriptionLookupException extends RuntimeException {
 	}
 
 	/**
-	 * @return EntityId
+	 * @return IndeterminateEntityId
 	 */
 	public function getEntityId() {
 		return $this->entityId;

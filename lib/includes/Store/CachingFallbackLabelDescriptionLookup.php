@@ -3,6 +3,7 @@
 namespace Wikibase\Lib\Store;
 
 use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 use Wikibase\DataModel\Services\Lookup\LabelDescriptionLookupException;
 use Wikibase\DataModel\Term\TermFallback;
 use Wikibase\Lib\TermFallbackCache\TermFallbackCacheFacade;
@@ -68,16 +69,23 @@ class CachingFallbackLabelDescriptionLookup implements FallbackLabelDescriptionL
 	}
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 *
 	 * @throws LabelDescriptionLookupException
 	 * @return TermFallback|null
 	 */
-	public function getDescription( EntityId $entityId ) {
+	public function getDescription( IndeterminateEntityId $entityId ) {
 		$languageCodes = $this->termLanguageFallbackChain->getFetchLanguageCodes();
 		if ( !$languageCodes ) {
 			// Can happen when the current interface language is not a valid term language, e.g. "de-formal"
 			return null;
+		}
+
+		if ( !( $entityId instanceof EntityId ) ) {
+			throw new LabelDescriptionLookupException(
+				$entityId,
+				'Expected $entityId to be an implementation of EntityId, but got: ' . get_class( $entityId ) . ' instead.'
+			);
 		}
 
 		$languageCode = $languageCodes[0];
@@ -87,16 +95,22 @@ class CachingFallbackLabelDescriptionLookup implements FallbackLabelDescriptionL
 	}
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 *
 	 * @throws LabelDescriptionLookupException
 	 * @return TermFallback|null
 	 */
-	public function getLabel( EntityId $entityId ) {
+	public function getLabel( IndeterminateEntityId $entityId ) {
 		$languageCodes = $this->termLanguageFallbackChain->getFetchLanguageCodes();
 		if ( !$languageCodes ) {
 			// Can happen when the current interface language is not a valid term language, e.g. "de-formal"
 			return null;
+		}
+		if ( !( $entityId instanceof EntityId ) ) {
+			throw new LabelDescriptionLookupException(
+				$entityId,
+				'Expected $entityId to be an implementation of EntityId, but got: ' . get_class( $entityId ) . ' instead.'
+			);
 		}
 
 		$languageCode = $languageCodes[0];

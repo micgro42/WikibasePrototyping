@@ -2,7 +2,7 @@
 
 namespace Wikibase\Repo\Store\Sql;
 
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 use Wikibase\Lib\Rdbms\RepoDomainDb;
 use Wikibase\Repo\Store\SubscriptionLookup;
 use Wikimedia\Rdbms\ConnectionManager;
@@ -27,11 +27,11 @@ class SqlSubscriptionLookup implements SubscriptionLookup {
 	/**
 	 * Return the existing subscriptions for given Id to check
 	 *
-	 * @param EntityId $idToCheck EntityId to get subscribers
+	 * @param IndeterminateEntityId $idToCheck EntityId to get subscribers
 	 *
 	 * @return string[] wiki IDs of wikis subscribed to the given entity
 	 */
-	public function getSubscribers( EntityId $idToCheck ) {
+	public function getSubscribers( IndeterminateEntityId $idToCheck ) {
 		return $this->repoConnections->getReadConnection()->newSelectQueryBuilder()
 			->select( 'cs_subscriber_id' )
 			->from( 'wb_changes_subscription' )

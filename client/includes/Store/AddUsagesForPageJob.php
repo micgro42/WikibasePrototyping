@@ -7,7 +7,7 @@ use JobSpecification;
 use MediaWiki\Title\Title;
 use Wikibase\Client\Usage\EntityUsage;
 use Wikibase\Client\WikibaseClient;
-use Wikibase\DataModel\Entity\EntityIdParser;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 use Wikimedia\Assert\Assert;
 
 /**
@@ -24,7 +24,7 @@ class AddUsagesForPageJob extends Job {
 	private $usageUpdater;
 
 	/**
-	 * @var EntityIdParser
+	 * @var PseudoEntityIdParser
 	 */
 	private $idParser;
 
@@ -77,7 +77,7 @@ class AddUsagesForPageJob extends Job {
 			'$params["usages"]' );
 
 		$usageUpdater = WikibaseClient::getStore()->getUsageUpdater();
-		$idParser = WikibaseClient::getEntityIdParser();
+		$idParser = WikibaseClient::getPseudoEntityIdParser();
 		$this->overrideServices( $usageUpdater, $idParser );
 	}
 
@@ -85,9 +85,9 @@ class AddUsagesForPageJob extends Job {
 	 * Service override for testing
 	 *
 	 * @param UsageUpdater $usageUpdater
-	 * @param EntityIdParser $idParser
+	 * @param PseudoEntityIdParser $idParser
 	 */
-	public function overrideServices( UsageUpdater $usageUpdater, EntityIdParser $idParser ) {
+	public function overrideServices( UsageUpdater $usageUpdater, PseudoEntityIdParser $idParser ) {
 		$this->usageUpdater = $usageUpdater;
 		$this->idParser = $idParser;
 	}

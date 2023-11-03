@@ -19,7 +19,7 @@ use Wikibase\Client\Usage\EntityUsage;
 use Wikibase\Client\Usage\PageEntityUsages;
 use Wikibase\Client\Usage\UsageAspectTransformer;
 use Wikibase\Client\Usage\UsageLookup;
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 use Wikibase\Lib\Changes\Change;
 use Wikibase\Lib\Changes\EntityChange;
 use Wikibase\Lib\Changes\ItemChange;
@@ -332,12 +332,12 @@ class AffectedPagesFinder {
 
 	/**
 	 * @param Title[] $titles
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 * @param string[] $aspects
 	 *
 	 * @return PageEntityUsages[]
 	 */
-	private function makeVirtualUsages( array $titles, EntityId $entityId, array $aspects ) {
+	private function makeVirtualUsages( array $titles, IndeterminateEntityId $entityId, array $aspects ) {
 		$usagesForItem = [];
 		foreach ( $aspects as $aspect ) {
 			[ $aspect, $modifier ] = EntityUsage::splitAspectKey( $aspect );
@@ -370,12 +370,12 @@ class AffectedPagesFinder {
 
 	/**
 	 * @param iterable<PageEntityUsages> $usages
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 * @param string[] $changedAspects
 	 *
 	 * @return iterable<PageEntityUsages>
 	 */
-	private function transformAllPageEntityUsages( iterable $usages, EntityId $entityId, array $changedAspects ): iterable {
+	private function transformAllPageEntityUsages( iterable $usages, IndeterminateEntityId $entityId, array $changedAspects ): iterable {
 		$aspectTransformer = new UsageAspectTransformer();
 		$aspectTransformer->setRelevantAspects( $entityId, $changedAspects );
 

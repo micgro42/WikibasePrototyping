@@ -14,9 +14,9 @@ use Traversable;
 use Wikibase\Client\Usage\EntityUsage;
 use Wikibase\Client\Usage\PageEntityUsages;
 use Wikibase\Client\WikibaseClient;
-use Wikibase\DataModel\Entity\EntityId;
-use Wikibase\DataModel\Entity\EntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdParsingException;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 use Wikibase\Lib\Rdbms\ClientDomainDb;
 use Wikimedia\Rdbms\IDatabase;
 use Wikimedia\Rdbms\IReadableDatabase;
@@ -35,7 +35,7 @@ class EntityUsageTable {
 
 	public const DEFAULT_TABLE_NAME = 'wbc_entity_usage';
 
-	private EntityIdParser $idParser;
+	private PseudoEntityIdParser $idParser;
 
 	private ?IDatabase $writeConnection;
 
@@ -50,7 +50,7 @@ class EntityUsageTable {
 	private LoggerInterface $logger;
 
 	/**
-	 * @param EntityIdParser $idParser
+	 * @param PseudoEntityIdParser $idParser
 	 * @param IDatabase|null $writeConnection If null, this instance can only be used for “read” queries.
 	 * @param int $batchSize Batch size for database queries on the entity usage table, including
 	 *  INSERTs, SELECTs, and DELETEs. Defaults to 100.
@@ -60,7 +60,7 @@ class EntityUsageTable {
 	 * @throws InvalidArgumentException
 	 */
 	public function __construct(
-		EntityIdParser $idParser,
+		PseudoEntityIdParser $idParser,
 		?IDatabase $writeConnection,
 		int $batchSize = 100,
 		?string $tableName = null,
@@ -212,12 +212,12 @@ class EntityUsageTable {
 	}
 
 	/**
-	 * @param EntityId[] $entityIds
+	 * @param IndeterminateEntityId[] $entityIds
 	 *
 	 * @return string[]
 	 */
 	private function getEntityIdStrings( array $entityIds ): array {
-		return array_map( function( EntityId $id ) {
+		return array_map( function( IndeterminateEntityId $id ) {
 			return $id->getSerialization();
 		}, $entityIds );
 	}
@@ -296,7 +296,7 @@ class EntityUsageTable {
 	/**
 	 * @see UsageLookup::getPagesUsing
 	 *
-	 * @param EntityId[] $entityIds
+	 * @param IndeterminateEntityId[] $entityIds
 	 * @param string[] $aspects
 	 *
 	 * @return Traversable A traversable over PageEntityUsages grouped by page.
@@ -362,9 +362,9 @@ class EntityUsageTable {
 	/**
 	 * @see UsageLookup::getUnusedEntities
 	 *
-	 * @param EntityId[] $entityIds
+	 * @param IndeterminateEntityId[] $entityIds
 	 *
-	 * @return EntityId[]
+	 * @return IndeterminateEntityId[]
 	 */
 	public function getUnusedEntities( array $entityIds ): array {
 		if ( empty( $entityIds ) ) {

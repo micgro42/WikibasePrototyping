@@ -7,7 +7,7 @@ use Wikibase\Client\Usage\EntityUsage;
 use Wikibase\Client\Usage\SubscriptionManager;
 use Wikibase\Client\Usage\UsageLookup;
 use Wikibase\Client\Usage\UsageTracker;
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 
 /**
  * Service for updating usage tracking and associated change subscription information.
@@ -150,7 +150,7 @@ class UsageUpdater {
 	/**
 	 * @param EntityUsage[] $entityUsages
 	 *
-	 * @return EntityId[]
+	 * @return IndeterminateEntityId[]
 	 */
 	private function getEntityIds( array $entityUsages ) {
 		$entityIds = [];

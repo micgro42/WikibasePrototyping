@@ -7,7 +7,7 @@ namespace Wikibase\Client\Usage\Sql;
 use Exception;
 use InvalidArgumentException;
 use Wikibase\Client\Usage\SubscriptionManager;
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 use Wikimedia\Rdbms\IDatabase;
 use Wikimedia\Rdbms\IReadableDatabase;
 use Wikimedia\Rdbms\SessionConsistentConnectionManager;
@@ -32,12 +32,12 @@ class SqlSubscriptionManager implements SubscriptionManager {
 	}
 
 	/**
-	 * @param EntityId[] $entityIds
+	 * @param IndeterminateEntityId[] $entityIds
 	 *
 	 * @return string[]
 	 */
 	private function idsToString( array $entityIds ): array {
-		return array_map( function( EntityId $id ) {
+		return array_map( function( IndeterminateEntityId $id ) {
 			return $id->getSerialization();
 		}, $entityIds );
 	}
@@ -46,7 +46,7 @@ class SqlSubscriptionManager implements SubscriptionManager {
 	 * @see SubscriptionManager::subscribe
 	 *
 	 * @param string $subscriber
-	 * @param EntityId[] $entityIds
+	 * @param IndeterminateEntityId[] $entityIds
 	 *
 	 * @throws InvalidArgumentException
 	 * @throws Exception
@@ -65,7 +65,7 @@ class SqlSubscriptionManager implements SubscriptionManager {
 	 * @see SubscriptionManager::unsubscribe
 	 *
 	 * @param string $subscriber Global site ID of the client
-	 * @param EntityId[] $entityIds The entities to subscribe to.
+	 * @param IndeterminateEntityId[] $entityIds The entities to subscribe to.
 	 *
 	 * @throws InvalidArgumentException
 	 * @throws Exception

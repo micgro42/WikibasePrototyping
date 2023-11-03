@@ -3,7 +3,7 @@
 namespace Wikibase\Client\Usage;
 
 use InvalidArgumentException;
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 
 /**
  * Value object representing the entity usages on a single page.
@@ -137,7 +137,7 @@ class PageEntityUsages {
 	/**
 	 * Returns all entities used on the page represented by this PageEntityUsages object.
 	 *
-	 * @return EntityId[] List of EntityIde objects, keyed and sorted by their identity string.
+	 * @return IndeterminateEntityId[] List of EntityIde objects, keyed and sorted by their identity string.
 	 */
 	public function getEntityIds() {
 		$entityIds = [];
@@ -157,11 +157,11 @@ class PageEntityUsages {
 	 * represented by this PageEntityUsages object. They aspects
 	 * will include any modifiers.
 	 *
-	 * @param EntityId $id
+	 * @param IndeterminateEntityId $id
 	 *
 	 * @return string[] List of aspect keys, sorted.
 	 */
-	public function getUsageAspectKeys( EntityId $id ) {
+	public function getUsageAspectKeys( IndeterminateEntityId $id ) {
 		$aspects = [];
 
 		foreach ( $this->usages as $usage ) {

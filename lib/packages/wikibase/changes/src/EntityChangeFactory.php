@@ -7,8 +7,8 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Wikibase\DataModel\Entity\EntityDocument;
-use Wikibase\DataModel\Entity\EntityId;
-use Wikibase\DataModel\Entity\EntityIdParser;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 use Wikibase\DataModel\Services\Diff\EntityDiffer;
 use Wikimedia\Assert\Assert;
 
@@ -25,7 +25,7 @@ class EntityChangeFactory {
 	private $entityDiffer;
 
 	/**
-	 * @var EntityIdParser
+	 * @var PseudoEntityIdParser
 	 */
 	private $idParser;
 
@@ -42,7 +42,7 @@ class EntityChangeFactory {
 
 	/**
 	 * @param EntityDiffer $entityDiffer
-	 * @param EntityIdParser $idParser
+	 * @param PseudoEntityIdParser $idParser
 	 * @param string[] $changeClasses Maps entity type IDs to subclasses of EntityChange.
 	 * Entity types not mapped explicitly are assumed to use EntityChange itself.
 	 * @param string $defaultEntityChange
@@ -50,7 +50,7 @@ class EntityChangeFactory {
 	 */
 	public function __construct(
 		EntityDiffer $entityDiffer,
-		EntityIdParser $idParser,
+		PseudoEntityIdParser $idParser,
 		array $changeClasses,
 		string $defaultEntityChange = EntityChange::class,
 		?LoggerInterface $logger = null
@@ -64,12 +64,12 @@ class EntityChangeFactory {
 
 	/**
 	 * @param string $action The action name
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 * @param array $fields additional fields to set
 	 *
 	 * @return EntityChange
 	 */
-	public function newForEntity( $action, EntityId $entityId, array $fields = [] ): EntityChange {
+	public function newForEntity( $action, IndeterminateEntityId $entityId, array $fields = [] ): EntityChange {
 		$entityType = $entityId->getEntityType();
 
 		if ( isset( $this->changeClasses[ $entityType ] ) ) {
@@ -99,13 +99,13 @@ class EntityChangeFactory {
 
 	/**
 	 * @param string $changeType
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 * @param array $fields additional fields to set
 	 *
 	 * @throws InvalidArgumentException
 	 * @return EntityChange
 	 */
-	public function newForChangeType( $changeType, EntityId $entityId, array $fields ): EntityChange {
+	public function newForChangeType( $changeType, IndeterminateEntityId $entityId, array $fields ): EntityChange {
 		$changeType = explode( '~', $changeType, 2 );
 		Assert::parameter(
 			isset( $changeType[1] ),

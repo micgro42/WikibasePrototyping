@@ -3,6 +3,7 @@
 namespace Wikibase\Lib\Store;
 
 use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 use Wikibase\DataModel\Services\Lookup\LabelDescriptionLookupException;
 use Wikibase\DataModel\Services\Lookup\TermLookup;
 use Wikibase\DataModel\Services\Lookup\TermLookupException;
@@ -43,16 +44,23 @@ class LanguageFallbackLabelDescriptionLookup implements FallbackLabelDescription
 	}
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 *
 	 * @throws LabelDescriptionLookupException
 	 * @return TermFallback|null
 	 */
-	public function getLabel( EntityId $entityId ) {
+	public function getLabel( IndeterminateEntityId $entityId ) {
 		$fetchLanguages = $this->termLanguageFallbackChain->getFetchLanguageCodes();
 
 		try {
-			$labels = $this->termLookup->getLabels( $entityId, $fetchLanguages );
+			if ( $entityId instanceof EntityId ) {
+				$labels = $this->termLookup->getLabels( $entityId, $fetchLanguages );
+			} else {
+				throw new LabelDescriptionLookupException(
+					$entityId,
+					'Expected $entityId to be an implementation of EntityId, but got: ' . get_class( $entityId ) . ' instead.'
+				);
+			}
 		} catch ( TermLookupException $ex ) {
 			throw new LabelDescriptionLookupException( $entityId, $ex->getMessage(), $ex );
 		}
@@ -61,16 +69,23 @@ class LanguageFallbackLabelDescriptionLookup implements FallbackLabelDescription
 	}
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 *
 	 * @throws LabelDescriptionLookupException
 	 * @return TermFallback|null
 	 */
-	public function getDescription( EntityId $entityId ) {
+	public function getDescription( IndeterminateEntityId $entityId ) {
 		$fetchLanguages = $this->termLanguageFallbackChain->getFetchLanguageCodes();
 
 		try {
-			$descriptions = $this->termLookup->getDescriptions( $entityId, $fetchLanguages );
+			if ( $entityId instanceof EntityId ) {
+				$descriptions = $this->termLookup->getDescriptions( $entityId, $fetchLanguages );
+			} else {
+				throw new LabelDescriptionLookupException(
+					$entityId,
+					'Expected $entityId to be an implementation of EntityId, but got: ' . get_class( $entityId ) . ' instead.'
+				);
+			}
 		} catch ( TermLookupException $ex ) {
 			throw new LabelDescriptionLookupException( $entityId, $ex->getMessage(), $ex );
 		}

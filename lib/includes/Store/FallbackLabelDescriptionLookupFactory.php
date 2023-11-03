@@ -6,6 +6,7 @@ namespace Wikibase\Lib\Store;
 
 use Language;
 use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 use Wikibase\DataModel\Services\Lookup\TermLookup;
 use Wikibase\DataModel\Services\Term\TermBuffer;
 use Wikibase\DataModel\Term\TermTypes;
@@ -55,7 +56,7 @@ class FallbackLabelDescriptionLookupFactory {
 	 * and has the given entity ID term types (if any) prefetched.
 	 *
 	 * @param Language $language
-	 * @param EntityId[] $entityIds Entity IDs to prefetch terms for, if any.
+	 * @param IndeterminateEntityId[] $entityIds Entity IDs to prefetch terms for, if any.
 	 * Only relevant if the factory was constructed with a TermBuffer.
 	 * @param string[] $termTypes Term types to prefetch (default: only labels).
 	 * One or more TermTypes constants.
@@ -82,19 +83,31 @@ class FallbackLabelDescriptionLookupFactory {
 			$languageFallbackChain
 		);
 
+		$pseudoEntityImplementation = new PseudoFallbackLabelDescriptionLookup(
+			$languageFallbackChain,
+		);
+
 		// this implementation ensures $cachingImplementation is not used for federated properties,
 		// where it does not work as of July 2022; the missing caching is unfortunate but okay,
 		// the missing redirect resolving is not relevant for properties
 		$dispatchingImplementation = new DispatchingFallbackLabelDescriptionLookup(
 			$cachingImplementation, // use this for most entity IDs
-			$languageImplementation // use this for federated properties
+			$languageImplementation, // use this for federated properties
+			$pseudoEntityImplementation // use this for pseudo entity IDs
 		);
 
 		// Optionally prefetch the terms of the entities passed in here
 		// ($termLookup is assumed to be based on $termBuffer then)
 		if ( $this->termBuffer !== null && $entityIds !== [] ) {
 			$languages = $languageFallbackChain->getFetchLanguageCodes();
-			$this->termBuffer->prefetchTerms( $entityIds, $termTypes, $languages );
+			$vanillaEntityIds = array_filter( $entityIds, fn( $entityId ) => $entityId instanceof EntityId );
+			'@phan-var array<EntityId> $vanillaEntityIds';
+			$this->termBuffer->prefetchTerms(
+				// FIXME this should work for PseudoEntities too! -> pseudo term lookup
+				$vanillaEntityIds,
+				$termTypes,
+				$languages
+			);
 		}
 
 		return $dispatchingImplementation;

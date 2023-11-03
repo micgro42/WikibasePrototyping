@@ -4,14 +4,17 @@ namespace Wikibase\Client\DataAccess\Scribunto;
 
 use InvalidArgumentException;
 use Language;
+use MediaWiki\HookContainer\HookContainer;
+use MediaWiki\MediaWikiServices;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Serializers\Serializer;
 use Wikibase\Client\Serializer\ClientEntitySerializer;
 use Wikibase\Client\Serializer\ClientStatementListSerializer;
 use Wikibase\Client\Usage\UsageAccumulator;
-use Wikibase\DataModel\Entity\EntityIdParser;
+use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\NumericPropertyId;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 use Wikibase\DataModel\Services\Lookup\EntityLookup;
 use Wikibase\DataModel\Services\Lookup\PropertyDataTypeLookup;
 use Wikibase\DataModel\Services\Lookup\UnresolvedEntityRedirectException;
@@ -27,7 +30,7 @@ use Wikibase\Lib\TermLanguageFallbackChain;
 class EntityAccessor {
 
 	/**
-	 * @var EntityIdParser
+	 * @var PseudoEntityIdParser
 	 */
 	private $entityIdParser;
 
@@ -75,9 +78,10 @@ class EntityAccessor {
 	 * @var LoggerInterface
 	 */
 	private $logger;
+	private HookContainer $hookContainer;
 
 	/**
-	 * @param EntityIdParser $entityIdParser
+	 * @param PseudoEntityIdParser $entityIdParser
 	 * @param EntityLookup $entityLookup
 	 * @param UsageAccumulator $usageAccumulator
 	 * @param Serializer $entitySerializer
@@ -88,7 +92,7 @@ class EntityAccessor {
 	 * @param ContentLanguages $termsLanguages
 	 */
 	public function __construct(
-		EntityIdParser $entityIdParser,
+		PseudoEntityIdParser $entityIdParser,
 		EntityLookup $entityLookup,
 		UsageAccumulator $usageAccumulator,
 		Serializer $entitySerializer,
@@ -109,6 +113,8 @@ class EntityAccessor {
 		$this->language = $language;
 		$this->termsLanguages = $termsLanguages;
 		$this->logger = $logger ?: new NullLogger();
+		// TODO: inject
+		$this->hookContainer = MediaWikiServices::getInstance()->getHookContainer();
 	}
 
 	/**
@@ -142,24 +148,37 @@ class EntityAccessor {
 
 		$entityId = $this->entityIdParser->parse( $prefixedEntityId );
 
-		try {
-			$entityObject = $this->entityLookup->getEntity( $entityId );
-		} catch ( UnresolvedEntityRedirectException $ex ) {
-			$this->logPossibleDoubleRedirect( $prefixedEntityId );
+		if ( $entityId instanceof EntityId ) {
 
-			return null;
+			try {
+				$entityObject = $this->entityLookup->getEntity( $entityId );
+			} catch ( UnresolvedEntityRedirectException $ex ) {
+				$this->logPossibleDoubleRedirect( $prefixedEntityId );
+
+				return null;
+			}
+
+			if ( $entityObject === null ) {
+				return null;
+			}
+
+			$entityArr = $this->newClientEntitySerializer()->serialize( $entityObject );
+		} else {
+			$entityArr = [];
+			$this->hookContainer->run(
+				'WikibasePseudoEntities_LoadPseudoEntityArray',
+				[ &$entityArr, $entityId ]
+			);
+			if ( $entityArr === [] ) {
+				return null;
+			}
 		}
-
-		if ( $entityObject === null ) {
-			return null;
-		}
-
-		$entityArr = $this->newClientEntitySerializer()->serialize( $entityObject );
 
 		// Renumber the entity as Lua uses 1-based array indexing
 		$this->renumber( $entityArr );
 		$entityArr['schemaVersion'] = 2;
 
+		// FIXME: assert array serialization structure to prevent Wikibase and EntitySchema from diverging
 		return $entityArr;
 	}
 
@@ -177,6 +196,14 @@ class EntityAccessor {
 
 		// This doesn't really depend on any aspect of the entity specifically.
 		$this->usageAccumulator->addOtherUsage( $entityId );
+		if ( !( $entityId instanceof EntityId ) ) {
+			$entityExists = false;
+			$this->hookContainer->run(
+				'WikibasePseudoEntities_EntityExists',
+				[ &$entityExists, $entityId ]
+			);
+			return $entityExists;
+		}
 		try {
 			return $this->entityLookup->hasEntity( $entityId );
 		} catch ( UnresolvedEntityRedirectException $ex ) {
@@ -198,6 +225,11 @@ class EntityAccessor {
 	public function getEntityStatements( $prefixedEntityId, $propertyIdSerialization, $rank ) {
 		$prefixedEntityId = trim( $prefixedEntityId );
 		$entityId = $this->entityIdParser->parse( $prefixedEntityId );
+
+		if ( !( $entityId instanceof EntityId ) ) {
+			// TODO: PseudoEntities do not have statements *yet*, see T345745
+			return null;
+		}
 
 		$propertyId = new NumericPropertyId( $propertyIdSerialization );
 		$this->usageAccumulator->addStatementUsage( $entityId, $propertyId );
@@ -231,7 +263,7 @@ class EntityAccessor {
 		return new ClientEntitySerializer(
 			$this->entitySerializer,
 			$this->dataTypeLookup,
-			$this->entityIdParser,
+			$this->entityIdParser->getVanillaEntityIdParser(),
 			array_unique( array_merge(
 				$this->termsLanguages->getLanguages(),
 				$this->termFallbackChain->getFetchLanguageCodes(),
@@ -245,7 +277,7 @@ class EntityAccessor {
 		return new ClientStatementListSerializer(
 			$this->statementSerializer,
 			$this->dataTypeLookup,
-			$this->entityIdParser
+			$this->entityIdParser->getVanillaEntityIdParser()
 		);
 	}
 

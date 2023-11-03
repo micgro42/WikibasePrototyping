@@ -6,7 +6,7 @@ namespace Wikibase\Client\Usage;
 
 use ArrayIterator;
 use Traversable;
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 
 /**
  * No-op implementation of the UsageTracker and UsageLookup interfaces.
@@ -64,9 +64,9 @@ class NullUsageTracker implements UsageTracker, UsageLookup {
 	/**
 	 * @see UsageLookup::getUnusedEntities
 	 *
-	 * @param EntityId[] $entityIds
+	 * @param IndeterminateEntityId[] $entityIds
 	 *
-	 * @return EntityId[]
+	 * @return IndeterminateEntityId[]
 	 */
 	public function getUnusedEntities( array $entityIds ): array {
 		return [];
@@ -75,7 +75,7 @@ class NullUsageTracker implements UsageTracker, UsageLookup {
 	/**
 	 * @see UsageLookup::getPagesUsing
 	 *
-	 * @param EntityId[] $entities
+	 * @param IndeterminateEntityId[] $entities
 	 * @param string[] $aspects
 	 *
 	 * @return Traversable Always empty.

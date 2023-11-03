@@ -18,7 +18,7 @@ use Wikibase\Client\Usage\SubscriptionManager;
 use Wikibase\Client\Usage\UsageLookup;
 use Wikibase\Client\Usage\UsageTracker;
 use Wikibase\DataAccess\WikibaseServices;
-use Wikibase\DataModel\Entity\EntityIdParser;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 use Wikibase\DataModel\Services\Entity\EntityPrefetcher;
 use Wikibase\DataModel\Services\Lookup\EntityLookup;
 use Wikibase\DataModel\Services\Lookup\RedirectResolvingEntityLookup;
@@ -49,7 +49,7 @@ use Wikimedia\Rdbms\SessionConsistentConnectionManager;
 class DirectSqlStore implements ClientStore {
 
 	/**
-	 * @var EntityIdParser
+	 * @var PseudoEntityIdParser
 	 */
 	private $entityIdParser;
 
@@ -150,7 +150,7 @@ class DirectSqlStore implements ClientStore {
 	private $termBuffer;
 
 	public function __construct(
-		EntityIdParser $entityIdParser,
+		PseudoEntityIdParser $entityIdParser,
 		EntityIdLookup $entityIdLookup,
 		WikibaseServices $wikibaseServices,
 		SettingsArray $settings,

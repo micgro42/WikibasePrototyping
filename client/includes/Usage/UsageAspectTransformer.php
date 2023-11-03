@@ -2,7 +2,7 @@
 
 namespace Wikibase\Client\Usage;
 
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 
 /**
  * Transforms usage aspect based on a filter of aspects relevant in some context.
@@ -32,20 +32,20 @@ class UsageAspectTransformer {
 	private $relevantAspectsPerEntity;
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 * @param string[] $aspects
 	 */
-	public function setRelevantAspects( EntityId $entityId, array $aspects ) {
+	public function setRelevantAspects( IndeterminateEntityId $entityId, array $aspects ) {
 		$key = $entityId->getSerialization();
 		$this->relevantAspectsPerEntity[$key] = $aspects;
 	}
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 *
 	 * @return string[]
 	 */
-	public function getRelevantAspects( EntityId $entityId ) {
+	public function getRelevantAspects( IndeterminateEntityId $entityId ) {
 		$key = $entityId->getSerialization();
 		return $this->relevantAspectsPerEntity[$key] ?? [];
 	}
@@ -59,12 +59,12 @@ class UsageAspectTransformer {
 	 * while getFilteredUsages( $q3, [ 'X' ] ) will return EntityUsage( $q3, 'T' )
 	 * and EntityUsage( $q3, 'L' ).
 	 *
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 * @param string[] $aspects
 	 *
 	 * @return EntityUsage[]
 	 */
-	public function getFilteredUsages( EntityId $entityId, array $aspects ) {
+	public function getFilteredUsages( IndeterminateEntityId $entityId, array $aspects ) {
 		$relevant = $this->getRelevantAspects( $entityId );
 		$effectiveAspects = $this->getFilteredAspects( $aspects, $relevant );
 
@@ -96,12 +96,12 @@ class UsageAspectTransformer {
 	}
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 * @param string[] $aspects (may have modifiers applied)
 	 *
 	 * @return EntityUsage[]
 	 */
-	private function buildEntityUsages( EntityId $entityId, array $aspects ) {
+	private function buildEntityUsages( IndeterminateEntityId $entityId, array $aspects ) {
 		$usages = [];
 
 		foreach ( $aspects as $aspect ) {

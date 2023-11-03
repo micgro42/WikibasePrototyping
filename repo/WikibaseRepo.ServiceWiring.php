@@ -658,7 +658,7 @@ return [
 
 		return new EntityChangeFactory(
 			WikibaseRepo::getEntityDiffer( $services ),
-			WikibaseRepo::getEntityIdParser( $services ),
+			WikibaseRepo::getPseudoEntityIdParser( $services ),
 			$changeClasses,
 			EntityChange::class,
 			WikibaseRepo::getLogger( $services )

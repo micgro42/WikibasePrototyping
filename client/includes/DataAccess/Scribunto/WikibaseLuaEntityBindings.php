@@ -5,8 +5,9 @@ namespace Wikibase\Client\DataAccess\Scribunto;
 use Language;
 use Wikibase\Client\DataAccess\StatementTransclusionInteractor;
 use Wikibase\Client\Usage\UsageAccumulator;
-use Wikibase\DataModel\Entity\EntityIdParser;
+use Wikibase\DataModel\Entity\EntityId;
 use Wikibase\DataModel\Entity\NumericPropertyId;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 use Wikibase\Lib\ContentLanguages;
 
 /**
@@ -28,7 +29,7 @@ class WikibaseLuaEntityBindings {
 	private $richWikitextTransclusionInteractor;
 
 	/**
-	 * @var EntityIdParser
+	 * @var PseudoEntityIdParser
 	 */
 	private $entityIdParser;
 
@@ -55,7 +56,7 @@ class WikibaseLuaEntityBindings {
 	public function __construct(
 		StatementTransclusionInteractor $plainTextTransclusionInteractor,
 		StatementTransclusionInteractor $richWikitextTransclusionInteractor,
-		EntityIdParser $entityIdParser,
+		PseudoEntityIdParser $entityIdParser,
 		ContentLanguages $termsLanguages,
 		Language $language,
 		UsageAccumulator $usageAccumulator,
@@ -118,6 +119,10 @@ class WikibaseLuaEntityBindings {
 	 */
 	public function addStatementUsage( $entityId, $propertyId ) {
 		$entityId = $this->entityIdParser->parse( $entityId );
+		if ( !( $entityId instanceof EntityId ) ) {
+			// TODO: PseudoEntities do not have statements *yet*, see T345745
+			return;
+		}
 		$propertyId = new NumericPropertyId( $propertyId );
 
 		$this->usageAccumulator->addStatementUsage( $entityId, $propertyId );
@@ -168,6 +173,11 @@ class WikibaseLuaEntityBindings {
 	 */
 	public function addSiteLinksUsage( $entityId ) {
 		$entityId = $this->entityIdParser->parse( $entityId );
+		if ( !( $entityId instanceof EntityId ) ) {
+			// Pseudo-Entities do not have sitelinks, so we don't need to track usage.
+			// FIXME: should we check for ItemId instead? After all, neither Lexemes, nor Properties nor MediaInfo can have sitelinks
+			return;
+		}
 		$this->usageAccumulator->addSiteLinksUsage( $entityId );
 	}
 

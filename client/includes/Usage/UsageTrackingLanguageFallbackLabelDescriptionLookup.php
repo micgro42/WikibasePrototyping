@@ -3,7 +3,7 @@
 namespace Wikibase\Client\Usage;
 
 use InvalidArgumentException;
-use Wikibase\DataModel\Entity\EntityId;
+use Wikibase\DataModel\Entity\IndeterminateEntityId;
 use Wikibase\DataModel\Services\Lookup\LabelDescriptionLookupException;
 use Wikibase\DataModel\Term\TermFallback;
 use Wikibase\Lib\Store\FallbackLabelDescriptionLookup;
@@ -62,12 +62,12 @@ class UsageTrackingLanguageFallbackLabelDescriptionLookup implements FallbackLab
 	}
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 *
 	 * @throws LabelDescriptionLookupException
 	 * @return TermFallback|null
 	 */
-	public function getLabel( EntityId $entityId ) {
+	public function getLabel( IndeterminateEntityId $entityId ) {
 		$termFallback = $this->labelDescriptionLookup->getLabel( $entityId );
 
 		foreach ( $this->getTouchedLanguages( $termFallback ) as $lang ) {
@@ -78,12 +78,12 @@ class UsageTrackingLanguageFallbackLabelDescriptionLookup implements FallbackLab
 	}
 
 	/**
-	 * @param EntityId $entityId
+	 * @param IndeterminateEntityId $entityId
 	 *
 	 * @throws LabelDescriptionLookupException
 	 * @return TermFallback|null
 	 */
-	public function getDescription( EntityId $entityId ) {
+	public function getDescription( IndeterminateEntityId $entityId ) {
 		$termFallback = $this->labelDescriptionLookup->getDescription( $entityId );
 
 		foreach ( $this->getTouchedLanguages( $termFallback ) as $lang ) {

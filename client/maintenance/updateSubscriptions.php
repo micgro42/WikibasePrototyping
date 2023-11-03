@@ -58,6 +58,7 @@ class UpdateSubscriptions extends Maintenance {
 		$settings = WikibaseClient::getSettings();
 		$clientId = $settings->getSetting( 'siteGlobalID' );
 
+		// FIXME: should probably be PseudoEntityIdParser?
 		$idParser = WikibaseClient::getEntityIdParser();
 		$startItemOption = $this->getOption( 'start-item' );
 
