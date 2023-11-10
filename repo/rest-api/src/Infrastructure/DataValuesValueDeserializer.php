@@ -7,9 +7,9 @@ use DataValues\Deserializers\DataValueDeserializer;
 use DataValues\IllegalValueException;
 use DataValues\TimeValue;
 use Deserializers\Exceptions\DeserializationException;
-use Wikibase\DataModel\Entity\EntityIdParser;
 use Wikibase\DataModel\Entity\EntityIdParsingException;
 use Wikibase\DataModel\Entity\EntityIdValue;
+use Wikibase\DataModel\Entity\PseudoEntityIdParser;
 use Wikibase\Repo\DataTypeValidatorFactory;
 use Wikibase\Repo\RestApi\Application\Serialization\InvalidFieldException;
 use Wikibase\Repo\RestApi\Application\Serialization\MissingFieldException;
@@ -22,13 +22,13 @@ use Wikibase\Repo\RestApi\Domain\Services\ValueTypeLookup;
 class DataValuesValueDeserializer implements ValueDeserializer {
 
 	private ValueTypeLookup $valueTypeLookup;
-	private EntityIdParser $entityIdParser;
+	private PseudoEntityIdParser $entityIdParser;
 	private DataValueDeserializer $dataValueDeserializer;
 	private DataTypeValidatorFactory $validatorFactory;
 
 	public function __construct(
 		ValueTypeLookup $valueTypeLookup,
-		EntityIdParser $entityIdParser,
+		PseudoEntityIdParser $entityIdParser,
 		DataValueDeserializer $dataValueDeserializer,
 		DataTypeValidatorFactory $validatorFactory
 	) {

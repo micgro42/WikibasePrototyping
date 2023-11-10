@@ -870,9 +870,9 @@ return [
 	},
 
 	'WbRestApi.StatementDeserializer' => function( MediaWikiServices $services ): StatementDeserializer {
-		$entityIdParser = WikibaseRepo::getEntityIdParser( $services );
+		$entityIdParser = WikibaseRepo::getPseudoEntityIdParser( $services );
 		$propertyValuePairDeserializer = new PropertyValuePairDeserializer(
-			$entityIdParser,
+			$entityIdParser->getVanillaEntityIdParser(),
 			WikibaseRepo::getPropertyDataTypeLookup( $services ),
 			new DataValuesValueDeserializer(
 				new DataTypeFactoryValueTypeLookup( WikibaseRepo::getDataTypeFactory( $services ) ),
