@@ -19,7 +19,7 @@ class EntityIdValue extends DataValueObject {
 
 	private $entityId;
 
-	public function __construct( EntityId $entityId ) {
+	public function __construct( IndeterminateEntityId $entityId ) {
 		$this->entityId = $entityId;
 	}
 
@@ -121,7 +121,7 @@ class EntityIdValue extends DataValueObject {
 	}
 
 	/**
-	 * @return EntityId
+	 * @return IndeterminateEntityId
 	 */
 	public function getEntityId() {
 		return $this->entityId;

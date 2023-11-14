@@ -503,7 +503,7 @@ return [
 				// TODO this should perhaps be factored out into a class
 				if ( isset( $value['id'] ) ) {
 					try {
-						return new EntityIdValue( WikibaseRepo::getEntityIdParser( $services )->parse( $value['id'] ) );
+						return new EntityIdValue( WikibaseRepo::getPseudoEntityIdParser( $services )->parse( $value['id'] ) );
 					} catch ( EntityIdParsingException $parsingException ) {
 						if ( is_string( $value['id'] ) ) {
 							$message = 'Can not parse id \'' . $value['id'] . '\' to build EntityIdValue with';
